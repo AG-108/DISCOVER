@@ -266,6 +266,7 @@ def drop_duplicates_v2(tokens, values):
 
     return new_tokens, new_values
 
+
 def evaluate_terms(execution_func,traversal, u, x):
     #original
     result, invalid, error_node, error_type = execution_func(traversal, u, x)

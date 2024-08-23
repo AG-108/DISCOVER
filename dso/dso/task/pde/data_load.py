@@ -23,24 +23,24 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
     load data and pass them to the corresponding PDE task 
     """
     X = []
-    
+
     noise_path = f'./dso/task/pde/noise_data_new/{dataset}_noise={noise_level}_data_ratio={data_amount}.npz'
     n_state_var = 1
     if dataset == 'chafee-infante': # 301*200
-        if noise_level>0:  
+        if noise_level>0:
 
             data = np.load(noise_path)
             u = data['U_pred'].T
             # u= np.load(noise_path1)
             # import pdb;pdb.set_trace()
-        else: 
+        else:
             u = np.load("./dso/task/pde/data_new/chafee_infante_CI.npy")
         x = np.load("./dso/task/pde/data_new/chafee_infante_x.npy").reshape(-1,1)
         t = np.load("./dso/task/pde/data_new/chafee_infante_t.npy").reshape(-1,1)
         n_input_var = 1
         sym_true = 'add,add,u1,n3,u1,diff2,u1,x1'
-        
-        n, m = u.shape 
+
+        n, m = u.shape
 
     elif dataset == 'Burgers':
         if noise_level>0:
@@ -48,7 +48,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
             data = np.load(noise_path)
             u = data['U_pred'].T
             data = scio.loadmat('./dso/task/pde/data_new/burgers.mat')
-        else: 
+        else:
             data = scio.loadmat('./dso/task/pde/data_new/burgers.mat')
             u=data.get("usol")
         x=np.squeeze(data.get("x")).reshape(-1,1)
@@ -62,8 +62,8 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
             data = np.load(noise_path)
             u = data['U_pred'].T
             data = scio.loadmat('./dso/task/pde/data_new/Kdv.mat')
-        else: 
-            
+        else:
+
             data = scio.loadmat('./dso/task/pde/data_new/Kdv.mat')
             u=data.get("uu")
         n,m=u.shape
@@ -77,7 +77,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
 
         right_side_origin = 'right_side_origin = -0.0025*uxxx_origin-u_origin*ux_origin'
         n_input_var = 1
-        
+
     elif dataset == 'PDE_divide':
         u=np.load("./dso/task/pde/data_new/PDE_divide.npy").T
         nx = 100
@@ -88,7 +88,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         sym_true = 'add,div,diff,u1,x1,x1,diff2,u1,x1'
         right_side_origin = 'right_side_origin = -config.divide(ux_origin, x_all) + 0.25*uxx_origin'
         n_input_var = 1
-        
+
     elif dataset == 'PDE_compound':
         if noise_level>0:
             data = np.load(noise_path)
@@ -100,7 +100,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         nt = 251
         x=np.linspace(1,2,nx).reshape(-1,1)
         t=np.linspace(0,0.5,nt).reshape(-1,1)
-        n, m = u.shape 
+        n, m = u.shape
         if training:
             u = u[int(n*0.1):int(n*0.9), int(m*0):int(m*1)]
             x = x[int(n*0.1):int(n*0.9)]
@@ -109,10 +109,10 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         sym_true = 'add,mul,u1,diff2,u1,x1,mul,diff,u1,x1,diff,u1,x1'
         right_side_origin = 'right_side_origin = u_origin*uxx_origin + ux_origin*ux_origin'
         n_input_var = 1
-       
+
     elif dataset == 'Burgers2':
         data = scipy.io.loadmat('./dso/task/pde/data/burgers2.mat')
-        
+
         t = np.real(data['t'].flatten()[:,None])
         x = np.real(data['x'].flatten()[:,None])
         u = np.real(data['usol']) # x first
@@ -121,37 +121,37 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         n_input_var = 1
 
     elif dataset == 'KS':
-        data = scipy.io.loadmat('./dso/task/pde/data/kuramoto_sivishinky.mat') # course temporal grid 
+        data = scipy.io.loadmat('./dso/task/pde/data/kuramoto_sivishinky.mat') # course temporal grid
         # import pdb;pdb.set_trace()
         t = np.real(data['t'].flatten()[:,None])
         x = np.real(data['x'].flatten()[:,None])
         u = np.real(data['u'])
-    
+
         sym_true = 'add,mul,u1,diff,u1,x1,add,diff2,u1,x1,diff4,u1,x1'
         n_input_var = 1
-        
+
     elif dataset == 'KS_sine':
-        data = scipy.io.loadmat('./dso/task/pde/data/KS_Sine.mat') # course temporal grid 
-        
+        data = scipy.io.loadmat('./dso/task/pde/data/KS_Sine.mat') # course temporal grid
+
         t = np.real(data['t'].flatten()[:,None])
         x = np.real(data['x'].flatten()[:,None])
         u = np.real(data['usol'])
-           
+
         sym_true = 'add,mul,u1,diff,u1,x1,add,diff2,u1,x1,diff4,u1,x1'
         n_input_var = 1
 
     elif dataset == 'KS2':
-        data = scipy.io.loadmat('./dso/task/pde/data/KS.mat') # course temporal grid 
+        data = scipy.io.loadmat('./dso/task/pde/data/KS.mat') # course temporal grid
         # import pdb;pdb.set_trace()
-        
+
         t = np.real(data['t'].flatten()[:,None])
         x = np.real(data['x'].flatten()[:,None])
         u = np.real(data['usol'])
-           
+
         sym_true = 'add,mul,u1,diff,u1,x1,add,diff2,u1,x1,diff2,diff2,u1,x1,x1'
         n_input_var = 1
     elif dataset == "fisher":
-    
+
         data=scipy.io.loadmat('./dso/task/pde/data/fisher_nonlin_groundtruth.mat')
 
         # D=data['D'] #0.02
@@ -162,9 +162,9 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         u=data['U'][1:-1,1:-1].T
         sym_true = "add,mul,u1,diff2,u1,x1,add,n2,diff,u1,x1,add,u1,n2,u1"
         n_input_var = 1
-        
+
     elif dataset == "fisher_linear":
-        
+
         data=scipy.io.loadmat('./dso/task/pde/data/fisher_groundtruth.mat')
 
         # D=data['D'] #0.02
@@ -175,7 +175,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         u=data['U'][1:-1,1:-1].T
         sym_true = "add,diff2,u1,x1,add,u1,n2,u1"
         n_input_var = 1
-    
+
     elif dataset == 'RRE':
         t = np.arange(1,10001)*0.01
         t=t.reshape(-1,1)
@@ -210,23 +210,37 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
         sym_true = None #groundtruth of the expression
         input_list = [u[:,i] for i in range(u.shape[1])]
         return input_list,X,t,ut,sym_true, n_input_var,[None],n_state_var
-    
-
     elif dataset == "chem":
         return load_chem_data()
+    elif dataset == 'battery':
+        data = np.load('./dso/task/pde/data_new/battery.npz')
+        u = data['u']
+        c = data['c'].squeeze().reshape(-1, 1)
+        t = data['t'].squeeze().reshape(1, -1, 1)
+        r = data['r'].squeeze().reshape(1, 1, -1)
+        X.append(t)
+        X.append(r)
+
+        u = np.transpose(u, (2,0,1))
+        ut = np.diff(u)/np.diff(c)
+
+        sym_true = None
+        n_input_var = 2
+        n_state_var = 1
+        return [u], X, c, ut, sym_true, n_input_var, [None], n_state_var
     else:
         assert False, "Unknown dataset"
-    
+
     n, m = u.shape
     ut = np.zeros((n, m))
     dt = t[1]-t[0]
     X.append(x)
- 
+
     print("noise level:" , noise_level)
 
     for idx in range(n):
         ut[idx, :] = FiniteDiff(u[idx, :], dt)
-        
+
     if noise_level>0 and training:
         # ut = ut[math.floor(n*0.1):math.ceil(n*0.9), math.floor(m*0.1):math.ceil(m*0.9)]
         ut = ut[math.floor(n*0.03):math.ceil(n*0.97), math.floor(m*0.03):math.ceil(m*0.97)]
@@ -237,7 +251,7 @@ def load_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =
 
 def inverse_sigmoid(y):
     # rhs = 1/(1 + np.exp(-rhs))
-    print(y)   
+    print(y)
     y_ = 1/(y)-1
     # print(np.any(y_<0))
     y_inv = -np.log(y_)
@@ -253,7 +267,7 @@ def load_chem_data():
     y_val= np.load('./dso/task/pde/data/9/y_val.npy').reshape(-1,1)
     X_test = np.load('./dso/task/pde/data/9/X_test.npy')
     y_test= np.load('./dso/task/pde/data/9/y_test.npy').reshape(-1,1)
-    
+
     # inverse y
     # y_train[y_train>=1]=0.999
     # y_train[y_train<=0] = 0.001
@@ -271,10 +285,10 @@ def load_chem_data():
     # x1_test = X_test[:,0:1]
     # x2_test = X_test[:,1:]
     # y_test_pred = 3.5000 * x2_test -0.185 * x2_test**3 + 2.14 + 3.83* x1_test
-    
+
     # y_test_trans = 1/(1+np.exp(-1*y_test_pred))
 
-    from sklearn.linear_model import LogisticRegression  
+    from sklearn.linear_model import LogisticRegression
     LR= LogisticRegression(penalty='l2', C=1e9)
     LR.fit(X_train, y_train)
 
@@ -308,7 +322,7 @@ def load_real_data():
     print(ut.shape)
     ut = cut_bound(ut, percent=0.1)
     X.append(x)
-    u = gPAR2 
+    u = gPAR2
     sym_true ='add,u1,mul,n2,u1,u2'
     sym_true ='add,u2,mul,n2,u2,u1'
     n_input_var=1
@@ -328,7 +342,7 @@ def load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_rati
         path='./dso/task/pde/data_new/noise_ch.npz'
         if noise_level>0:
             u = np.load(noise_path)
-        else:  
+        else:
             data = np.load(path)
             u = data['u']
 
@@ -343,15 +357,15 @@ def load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_rati
         X.append(y)
         n_input_var = 2
         n_state_var = 1
-        
+
         sym_true = 'sub,lap,sub,n3,u1,u1,lap,lap,u1'
-       
-    
+
+
         ut = np.zeros((t_len, n,m))
-       
+
         ut= (u[1:]-u[0:t_len-1])/(t[1]-t[0])
         u=u[:-1]
-     
+
         if training:
             u_test= u[249:251]
             ut_test = ut[249:251]
@@ -362,14 +376,14 @@ def load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_rati
                 ut = ut[:3] #ut[240:260]
 
         else:
-            u_test, ut_test = None, None  
-        
+            u_test, ut_test = None, None
+
     elif dataset == 'Allen_Cahn_2D':
         path = './dso/task/pde/data_new/bcpinn_ac.npz'
-        if noise_level>0:  
+        if noise_level>0:
             u = np.load(noise_path)
         else:
-            
+
             data = np.load(path)
             u = data['u']
         t_len,n,m= u.shape
@@ -377,30 +391,30 @@ def load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_rati
         h = 1/64
         y = np.linspace(-0.5 * h, 1 + h * 0.5, 64 + 2)[1:-1].reshape(1,1,-1)
         x = np.linspace(-0.5 * h, 1 + h * 0.5, 64 + 2)[1:-1].reshape(1,1,-1)
-        
+
         t= np.linspace(0,5,100,endpoint=False)
 
         X.append(x)
         X.append(y)
-        
+
         n_input_var = 2
         sym_true = 'n3,mul,div,div,u1,mul,Diff,n3,x2,x1,x2,n2,u1,x1'
         # sym_true = 'add,sub,lap,u1,n3,u1,u'
         sym_true = 'add,add,Diff2,u1,x1,Diff2,u1,x2,sub,u1,n3,u1'
 
         ut = np.zeros((t_len, n,m))
-  
+
         ut= (u[1:]-u[0:t_len-1])/(t[1]-t[0])
         u=u[:-1]
-        
+
         if training:
             u_test=u[39:41]
             ut_test = ut[39:41]
             u = u[:3]#[38:43]      #[31:51]
             ut = ut[:3]#[38:43]  #[31:51]
         else:
-            u_test, ut_test = None, None  
-        
+            u_test, ut_test = None, None
+
         # lap = (Diff2_2(u1, x, 1)+Diff2_2(u1,x,2))
 
     else:
@@ -412,7 +426,7 @@ def load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_rati
         ut = ut[math.floor(t_len*0.1):math.ceil(t_len*0.9), math.floor(n*0.1):math.ceil(n*0.9),math.floor(m*0.1):math.ceil(m*0.9)]
         if u_test is not None:
             ut_test = ut_test[:,math.floor(n*0.1):math.ceil(n*0.9),math.floor(m*0.1):math.ceil(m*0.9)]
-        
+
     return [u],X,t,ut,sym_true, n_input_var,[u_test, ut_test],n_state_var
 
 def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, cut_ratio =0.03):
@@ -420,7 +434,7 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
         return load_data_2D(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =0.03)
     elif dataset == 'rd_MD_NU':
         data = scipy.io.loadmat('./dso/task/pde/data/reaction_diffusion_standard.mat') # grid 256*256*201
-            
+
         t = np.real(data['t'].flatten()[:,None])
         x = np.real(data['x'].flatten()[:,None])
         y = np.real(data['y'].flatten()[:,None])
@@ -437,39 +451,39 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
         if noise_level>0 and training:
             # ut = ut[math.floor(n*0.1):math.ceil(n*0.9), math.floor(m*0.1):math.ceil(m*0.9)]
             ut = ut[math.floor(t_len*0.03):math.ceil(t_len*0.97),math.floor(n*0.03):math.ceil(n*0.97), math.floor(m*0.03):math.ceil(m*0.97)]
-        
+
         n_state_var = 2
         return [Exact_u,Exact_v,],X,t,ut, sym_true,n_input_var,[None,None],n_state_var
     elif "ns" in dataset:
         if dataset == 'ns_MD_NU':
-            data = scipy.io.loadmat('./dso/task/pde/data/Vorticity_ALL.mat')        
+            data = scipy.io.loadmat('./dso/task/pde/data/Vorticity_ALL.mat')
             steps = 151
             n = 449
             m = 199
             dt = 0.2
             dx = 0.02
             dy = 0.02
-            
+
             xmin = 100
             xmax = 425
             ymin = 15
-            ymax = 185 
+            ymax = 185
             W = data['VORTALL'].reshape(n,m,steps)   # vorticity
             U = data['UALL'].reshape(n,m,steps)      # x-component of velocity
-            V = data['VALL'].reshape(n,m,steps)      # y-component of velocity  
+            V = data['VALL'].reshape(n,m,steps)      # y-component of velocity
             W = W[xmin:xmax,ymin:ymax,:]
             U = U[xmin:xmax,ymin:ymax,:]
             V = V[xmin:xmax,ymin:ymax,:]
             n,m,steps = W.shape
-            
+
             W = np.transpose(W.reshape(n,m,steps),(2,0,1))  # vorticity
             U = np.transpose(U.reshape(n,m,steps),(2,0,1))      # x-component of velocity
             V = np.transpose(V.reshape(n,m,steps),(2,0,1))      # y-component of velocit
-            t_data = np.arange(steps).reshape(( -1,1))*dt 
+            t_data = np.arange(steps).reshape(( -1,1))*dt
             x_data = np.arange(n).reshape(( 1,-1,1))*dx
             y_data = np.arange(m).reshape((1,1,-1))*dy
-            
-            
+
+
             steps,n,m = W.shape
             dt =t_data[1,0]-t_data[0,0]
             ut = W
@@ -481,7 +495,7 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
             X = [x_data, y_data]
             n_input_var = 2
             n_state_var = 3
-            sym_true ="add,mul,u2,Diff,u1,x1,add,mul,u3,Diff,u1,x2,add,Diff2,u1,x2,Diff2,u1,x1" 
+            sym_true ="add,mul,u2,Diff,u1,x1,add,mul,u3,Diff,u1,x2,add,Diff2,u1,x2,Diff2,u1,x1"
         elif dataset == "ns_transport_MD_NU":
             center_box = scipy.io.loadmat('./dso/task/pde/data/domain_profile.mat')
             center_box_coordinates  = scipy.io.loadmat('./dso/task/pde/data/domain_coordinates.mat') #127*127*500
@@ -508,19 +522,19 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
             U = U[xmin:xmax,ymin:ymax,:]#.transpose(1,0,2)#t_range]
             V = V[xmin:xmax,ymin:ymax,:]#.transpose(1,0,2)#t_range]
             n,m,steps = W.shape
-            
+
             dx = center_x[0,1] - center_x[0,0]
             dy = center_y[1,0] - center_y[0,0]
             print(" dx is ", dx , " dy is ", dy)
             dt = 0.0005
-            
+
             W = np.transpose(W.reshape(n,m,steps),(2,0,1))  # vorticity
             U = np.transpose(U.reshape(n,m,steps),(2,0,1))      # x-component of velocity
             V = np.transpose(V.reshape(n,m,steps),(2,0,1))      # y-component of velocit
-            t_data = np.arange(steps).reshape(( -1,1))*dt 
+            t_data = np.arange(steps).reshape(( -1,1))*dt
             x_data = np.arange(n).reshape(( 1,-1,1))*dx
             y_data = np.arange(m).reshape((1,1,-1))*dy
-            
+
             # plt.imshow(U[300,:,:])
             # plt.show()    
             # import pdb;pdb.set_trace()        
@@ -545,7 +559,7 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
         uv = data['uv']
         u = np.transpose(uv[:,:,:,:,0], (3, 0,1,2))
         v = np.transpose(uv[:,:,:,:,1],(3,0,1,2))
-        t =data['t']
+        t = data['t']
         dt = t[1]-t[0]
         t_data = t.reshape(-1,1)
         x_data = x.reshape(1,-1,1,1)
@@ -561,13 +575,13 @@ def load_data_MD_NU(dataset, noise_level=0, data_amount = 1, training = False, c
         ut[1:,:,:,:] = (u[1:,:,:,:] - u[:-1,:,:,:])/dt
         vt[1:,:,:,:] = (v[1:,:,:,:] - v[:-1,:,:,:])/dt
         n_input_var = 3
-        n_state_var =2 
+        n_state_var = 2
         t_len,n, m,p = u.shape
         if noise_level>0 and training:
             ut = cut_bound(ut,0.05)
             vt = cut_bound(vt,0.05)
         return [u,v], X, t_data, ut, sym_true, n_input_var, [None, None],n_state_var
-    
+
 def load_param_data(dataset,noise_level=0, data_amount = 1, training=False,cut_ratio =0.03):
     X=[]
     u_list = []
@@ -581,7 +595,7 @@ def load_param_data(dataset,noise_level=0, data_amount = 1, training=False,cut_r
         k = 2*np.pi*fftfreq(n, d = dx)
         params = (k, -1, 0.1, 0.25)
         # Initial condition
-        u0 = np.exp(-(x+1)**2)  
+        u0 = np.exp(-(x+1)**2)
         u = odeint(parametric_burgers_rhs, u0, t, args=(params,)).T
         sym_true = 'add,add,mul,sin,x2,mul,u1,diff,u1,x1,mul,u1,diff,u1,x1,diff2,u1,x1'
         sym_true = 'add,add,mul,const,mul,sin,x2,mul,u1,diff,u1,x1,mul,const,mul,u1,diff,u1,x1,mul,const,diff2,u1,x1'
@@ -591,7 +605,7 @@ def load_param_data(dataset,noise_level=0, data_amount = 1, training=False,cut_r
         xx = xx.T
         tt = tt.T
         u_list.append(u)
-        
+
         diff2 = Diff2(u,xx,1)
         udiffu = u*Diff(u,xx,1)
         # u_list.append(diff2)
@@ -600,18 +614,18 @@ def load_param_data(dataset,noise_level=0, data_amount = 1, training=False,cut_r
         assert False, "wrong dataset"
     n, m = u.shape
     ut = np.zeros((n, m))
-   
+
     X.append(xx)
     X.append(tt)
     X.append("t info")
- 
+
     print("noise level:" , noise_level)
     # import pdb;pdb.set_trace()
     for idx in range(n):
         ut[idx, :] = FiniteDiff(u[idx, :], dt)
     if noise_level>0 and training:
         # ut = ut[math.floor(n*0.1):math.ceil(n*0.9), math.floor(m*0.1):math.ceil(m*0.9)]
-        ut = ut[math.floor(n*0.03):math.ceil(n*0.97), math.floor(m*0.03):math.ceil(m*0.97)]    
+        ut = ut[math.floor(n*0.03):math.ceil(n*0.97), math.floor(m*0.03):math.ceil(m*0.97)]
     n_state_var = 1
     return u_list,X,t,ut,sym_true, n_input_var,None,n_state_var
 
@@ -661,7 +675,7 @@ def load_subgrid_test():
     ut = ds_test['q_subgrid_forcing'].data
 
     return u_list, ut
-    
+
 
 
 if  __name__ ==  "__main__":

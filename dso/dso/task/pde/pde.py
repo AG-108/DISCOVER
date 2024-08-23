@@ -3,7 +3,6 @@ import pandas as pd
 import scipy.io as scio
 from scipy.stats import pearsonr
 
-
 from dso.task import HierarchicalTask
 from dso.library import Library
 from dso.functions import create_tokens
@@ -20,24 +19,24 @@ class PDETask(HierarchicalTask):
     task_type = "pde"
 
     def __init__(self, function_set, dataset, metric="residual",
-                metric_params=(0.01,), extra_metric_test=None,
-                extra_metric_test_params=(), reward_noise=0.0,
-                reward_noise_type="r", threshold=1e-12,
-                data_noise_level=0,
-                data_amount = 1,
-                use_meta_data = False,
-                use_torch = False,
-                sym_true_input =None,
-                max_depth=4,
-                normalize_variance=False, protected=False,
-                spatial_error = True, 
-                decision_tree_threshold_set=None,
-                cut_ratio = 0.03,
-                n_input_var = None,
-                data_info = None,
-                add_const = False,
-                eq_num=1
-                ):
+                 metric_params=(0.01,), extra_metric_test=None,
+                 extra_metric_test_params=(), reward_noise=0.0,
+                 reward_noise_type="r", threshold=1e-12,
+                 data_noise_level=0,
+                 data_amount=1,
+                 use_meta_data=False,
+                 use_torch=False,
+                 sym_true_input=None,
+                 max_depth=4,
+                 normalize_variance=False, protected=False,
+                 spatial_error=True,
+                 decision_tree_threshold_set=None,
+                 cut_ratio=0.03,
+                 n_input_var=None,
+                 data_info=None,
+                 add_const=False,
+                 eq_num=1
+                 ):
         """
         Parameters
         ----------
@@ -89,39 +88,39 @@ class PDETask(HierarchicalTask):
 
         super(HierarchicalTask).__init__()
 
-    
         # self.X_test = self.y_test = self.y_test_noiseless = None
         self.name = dataset
         self.noise_level = data_noise_level
         self.spatial_error = spatial_error
         self.cut_ratio = cut_ratio
-        
-        if data_noise_level>0 and use_torch:
+
+        if data_noise_level > 0 and use_torch:
             load_class = load_noise_data
             opt_params = use_meta_data
-            print("use_meta_data",use_meta_data)
+            print("use_meta_data", use_meta_data)
         else:
             opt_params = True
             if '2D' in dataset:
-                load_class = load_data_2D 
+                load_class = load_data_2D
             elif "para" in dataset:
                 load_class = load_param_data
             elif "force" in dataset:
-                load_class= load_subgrid_data
+                load_class = load_subgrid_data
                 opt_params = data_info
-            elif "MD_NU" in dataset: # multi input and multi-dimension
+            elif "MD_NU" in dataset:  # multi input and multi-dimension
                 load_class = load_data_MD_NU
             else:
                 load_class = load_data
-                
-            
-        self.u,self.x,t, ut,sym_true, n_input_var,test_list,n_state_var = load_class(dataset, data_noise_level, data_amount, opt_params,cut_ratio =cut_ratio)
- 
-        self.ut=ut
+
+        self.u, self.x, t, ut, sym_true, n_input_var, test_list, n_state_var = load_class(dataset, data_noise_level,
+                                                                                          data_amount, opt_params,
+                                                                                          cut_ratio=cut_ratio)
+
+        self.ut = ut
         self.sym_true = sym_true
-        self.add_const=add_const
+        self.add_const = add_const
         self.eq_num = eq_num
-        self.ut = self.ut.reshape(-1,1)
+        self.ut = self.ut.reshape(-1, 1)
         self.max_depth = max_depth
         if torch.is_tensor(self.ut):
             self.ut = tensor2np(self.ut)
@@ -137,11 +136,10 @@ class PDETask(HierarchicalTask):
         self.extra_metric_test = extra_metric_test
         self.metric_test = None
         if test_list is not None and test_list[0] is not None:
-            self.u_test,self.ut_test = test_list
-            self.ut_test = self.ut_test.reshape(-1,1)
+            self.u_test, self.ut_test = test_list
+            self.ut_test = self.ut_test.reshape(-1, 1)
         else:
-            self.u_test,self.ut_test = None,None
-  
+            self.u_test, self.ut_test = None, None
 
         """
         Configure reward noise.
@@ -153,10 +151,9 @@ class PDETask(HierarchicalTask):
 
         self.rng = None
         self.scale = None
-        
- 
+
         # Set the Library 
-        
+
         tokens = create_tokens(n_input_var=n_input_var,
                                function_set=function_set,
                                protected=protected,
@@ -168,35 +165,34 @@ class PDETask(HierarchicalTask):
         # Set stochastic flag
         self.stochastic = reward_noise > 0.0
 
-
-    def set_data(self,dataset,data_noise_level,use_torch,use_meta_data,data_amount):
+    def set_data(self, dataset, data_noise_level, use_torch, use_meta_data, data_amount):
         pass
-    
-    def reward_function(self,p):
+
+    def reward_function(self, p):
         # import pdb;pdb.set_trace()
         y_hat, _, w = p.execute(self.u, self.x, self.ut)
         n = len(w)
         if p.invalid:
             # print(p.tokens)
-            
+
             return self.invalid_reward, [0]
-        
-        r = self.metric(self.ut, y_hat,n)
+
+        r = self.metric(self.ut, y_hat, n)
 
         return r, w
-    
-    def mse_function(self,p):
+
+    def mse_function(self, p):
         """
         task function utilized to calculate mse for coeffcients
         """
         y_hat, y_right, w = p.execute(self.u, self.x, self.ut)
-        diffs = y_hat-self.ut
-        loss = (np.mean(np.square(diffs))) 
+        diffs = y_hat - self.ut
+        loss = (np.mean(np.square(diffs)))
         return loss
 
     def evaluate(self, p):
         # Compute predictions on test data
-        y_hat,y_right,  w = p.execute(self.u, self.x, self.ut)
+        y_hat, y_right, w = p.execute(self.u, self.x, self.ut)
 
         n = len(w)
         # y_hat = p.execute(self.X_test)
@@ -216,13 +212,12 @@ class PDETask(HierarchicalTask):
             success = nmse_test < self.threshold
 
         info = {
-            "nmse_test" : nmse_test,
-            "success" : success,
+            "nmse_test": nmse_test,
+            "success": success,
 
         }
         if self.u_test is not None:
-        
-            y_hat_test,y_right, w_test = p.execute(self.u_test, self.x, self.ut_test, test=True)
+            y_hat_test, y_right, w_test = p.execute(self.u_test, self.x, self.ut_test, test=True)
             info.update({
                 'w_test': w_test
             })
@@ -232,27 +227,26 @@ class PDETask(HierarchicalTask):
                 m_test = None
                 m_test_noiseless = None
             else:
-                m_test = self.metric_test(self.y_test, y_hat,n)
-                m_test_noiseless = self.metric_test(self.y_test_noiseless, y_hat,n)
+                m_test = self.metric_test(self.y_test, y_hat, n)
+                m_test_noiseless = self.metric_test(self.y_test_noiseless, y_hat, n)
 
             info.update({
-                self.extra_metric_test : m_test,
-                self.extra_metric_test + '_noiseless' : m_test_noiseless
+                self.extra_metric_test: m_test,
+                self.extra_metric_test + '_noiseless': m_test_noiseless
             })
 
         return info
-    
-    def evaluate_diff(self, p):
-        y_hat,y_right,  w = p.execute(self.u, self.x, self.ut)
-        return self.ut-y_hat
-        
-    def set_ut(self, ut_diff):
-        self.ut=ut_diff
 
-    def reset_ut(self,id ):
+    def evaluate_diff(self, p):
+        y_hat, y_right, w = p.execute(self.u, self.x, self.ut)
+        return self.ut - y_hat
+
+    def set_ut(self, ut_diff):
+        self.ut = ut_diff
+
+    def reset_ut(self, id):
         assert self.ut_cache is not None
         self.ut = self.ut_cache[id]
-
 
     def terms_values(self, p):
         '''return results list and terms list
@@ -295,46 +289,49 @@ def make_pde_metric(name, *args):
     # ut = 
     all_metrics = {
 
-        "inv_nrmse" :    (lambda y, y_hat : 1/(1 + np.sqrt(np.mean((y - y_hat)**2)/np.var(y))),
-                        1),
+        "inv_nrmse": (lambda y, y_hat: 1 / (1 + np.sqrt(np.mean((y - y_hat) ** 2) / np.var(y))),
+                      1),
 
-        "pde_reward":  (lambda y, y_hat,n : (1-args[0]*n)/(1 + np.sqrt(np.mean((y - y_hat)**2)/np.var(y))),
-                        1),
+        "pde_reward": (lambda y, y_hat, n: (1 - args[0] * n) / (1 + np.sqrt(np.mean((y - y_hat) ** 2) / np.var(y))),
+                       1),
 
-        "correlation": (lambda y,y_hat,n: pearsonr(y.ravel(), y_hat.ravel())[0],
+        "correlation": (lambda y, y_hat, n: pearsonr(y.ravel(), y_hat.ravel())[0],
                         1),
-        "R2":(lambda y, y_hat,n: 1 - ((y_hat - y)**2).sum() / ((y - y.mean())**2).sum() )
+        "R2": (lambda y, y_hat, n: 1 - ((y_hat - y) ** 2).sum() / ((y - y.mean()) ** 2).sum())
 
-      
     }
 
     assert name in all_metrics, "Unrecognized reward function name."
-    assert len(args) == all_metrics[name][1], "For {}, expected {} reward function parameters; received {}.".format(name,all_metrics[name][1], len(args))
+    assert len(args) == all_metrics[name][1], "For {}, expected {} reward function parameters; received {}.".format(
+        name, all_metrics[name][1], len(args))
     metric = all_metrics[name][0]
 
     # For negative MSE-based rewards, invalid reward is the value of the reward function when y_hat = mean(y)
     # For inverse MSE-based rewards, invalid reward is 0.0
     # For non-MSE-based rewards, invalid reward is the minimum value of the reward function's range
     all_invalid_rewards = {
-       
-        "inv_nrmse" : 0.0, #1/(1 + args[0]),
-        'pde_reward':0.0,
-        'correlation':0.0
+
+        "inv_nrmse": 0.0,  # 1/(1 + args[0]),
+        'pde_reward': 0.0,
+        'correlation': 0.0
 
     }
     invalid_reward = all_invalid_rewards[name]
 
     all_max_rewards = {
-        "inv_nrmse" : 1.0,
-        "pde_reward":1.0,
-        'correlation':1.0
+        "inv_nrmse": 1.0,
+        "pde_reward": 1.0,
+        'correlation': 1.0
 
     }
     max_reward = all_max_rewards[name]
 
     return metric, invalid_reward, max_reward
 
+
 def test():
     pass
+
+
 if __name__ == '__main__':
     tas = test()

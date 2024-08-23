@@ -101,7 +101,7 @@
       "epsilon" : 0.01,
       // Recommended to set this to as many cores as you can use! Especially if
       // using the "const" token.
-      "n_cores_batch" : 1,
+      "n_cores_batch" : 8,
       "early_stopping" : false,
       "stability_selection" : 3
    },

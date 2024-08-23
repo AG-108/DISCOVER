@@ -1,0 +1,101 @@
+r,count_on_policy,count_off_policy,expression,traversal,nmse_test,success
+0.9727804001854877,4,0,"-1.0006 * mul(u1,diff(u1,x1)) + -0.0025 * diff3(u1,x1)","add,mul,u1,diff,u1,x1,diff3,u1,x1",0.00016682123727951648,True
+0.9673252429060336,1,0,"-0.0025 * diff3(u1,x1) + -0.0007 * diff(u1,x1) + -0.5001 * diff(n2(u1),x1)","add,add,diff3,u1,x1,diff,u1,x1,diff,n2,u1,x1",2.3156790420321395e-05,True
+0.9673252429060336,1,0,"-0.5001 * diff(mul(u1,u1),x1) + -0.0025 * diff3(u1,x1) + -0.0007 * diff(u1,x1)","add,add,diff,mul,u1,u1,x1,diff3,u1,x1,diff,u1,x1",2.3156790420321378e-05,True
+0.9673252429060336,1,0,"-0.5001 * diff(n2(u1),x1) + -0.0025 * diff3(u1,x1) + -0.0007 * diff(u1,x1)","add,add,diff,n2,u1,x1,diff3,u1,x1,diff,u1,x1",2.3156790420321378e-05,True
+0.9668751780147076,1,0,"-0.0025 * diff3(u1,x1) + 0.0001 * u1 + -0.5002 * diff(n2(u1),x1)","add,diff3,u1,x1,add,u1,diff,n2,u1,x1",3.163475331734025e-05,True
+0.9628556730558356,1,0,"-0.0004 * u1 + -1.0006 * mul(u1,diff(u1,x1)) + -0.0025 * diff3(u1,x1)","add,add,u1,mul,u1,diff,u1,x1,diff3,u1,x1",0.00016674582383760796,True
+0.5632932763136167,1,0,"-0.0058 * diff2(u1,x1) + -0.6171 * diff(mul(x1,u1),x1) + 0.1088 * diff(u1,x1)","add,add,diff2,u1,x1,diff,mul,x1,u1,x1,diff,u1,x1",1.578876937061277,False
+0.5512423287031272,2,0,"-0.5842 * mul(x1,diff(u1,x1)) + 0.1010 * diff(u1,x1)","add,mul,x1,diff,u1,x1,diff,u1,x1",1.832286579996201,False
+0.5512423287031272,1,0,"-0.2921 * mul(diff(n2(x1),x1),diff(u1,x1)) + 0.1010 * diff(u1,x1)","add,mul,diff,n2,x1,x1,diff,u1,x1,diff,u1,x1",1.832286579996201,False
+0.5512423287031272,1,0,"-0.2921 * mul(diff(u1,x1),diff(mul(x1,x1),x1)) + 0.1010 * diff(u1,x1)","add,mul,diff,u1,x1,diff,mul,x1,x1,x1,diff,u1,x1",1.832286579996201,False
+0.5512423287031272,2,0,"-0.5842 * mul(diff(u1,x1),x1) + 0.1010 * diff(u1,x1)","add,mul,diff,u1,x1,x1,diff,u1,x1",1.832286579996201,False
+0.5512423287031272,1,0,"0.1010 * diff(u1,x1) + -0.2921 * mul(x1,add(diff(u1,x1),diff(u1,x1)))","add,diff,u1,x1,mul,x1,add,diff,u1,x1,diff,u1,x1",1.8322865799962005,False
+0.5512423287031272,2,0,"0.1010 * diff(u1,x1) + -0.5842 * mul(diff(u1,x1),x1)","add,diff,u1,x1,mul,diff,u1,x1,x1",1.832286579996201,False
+0.5497980101009291,1,0,"-0.5867 * mul(x1,add(diff(u1,x1),u1)) + 0.1012 * diff(u1,x1)","add,mul,x1,add,diff,u1,x1,u1,diff,u1,x1",1.854356426292307,False
+0.5481686368056046,1,0,"-0.0048 * diff2(u1,x1) + -0.4255 * diff(mul(x1,u1),x1)","add,diff2,u1,x1,diff,mul,x1,u1,x1",1.8795535591280401,False
+0.5476406441062507,1,0,"-0.4608 * diff(mul(x1,u1),x1) + -0.0455 * diff(n2(u1),x1) + 0.1404 * diff(u1,x1)","add,add,diff,mul,x1,u1,x1,diff,n2,u1,x1,diff,u1,x1",1.8014723630340674,False
+0.5476406441062507,1,0,"-0.4608 * diff(mul(u1,x1),x1) + -0.0455 * diff(n2(u1),x1) + 0.1404 * diff(u1,x1)","add,add,diff,mul,u1,x1,x1,diff,n2,u1,x1,diff,u1,x1",1.8014723630340674,False
+0.5466585248720669,1,0,"-0.0005 * diff3(u1,x1) + -0.0016 * diff2(u1,x1) + 0.0021 * mul(diff3(u1,x1),x1)","add,diff3,u1,x1,add,diff2,u1,x1,mul,diff3,u1,x1,x1",1.816369072591649,False
+0.5456974606349101,1,0,"0.5441 * u1 + -0.5847 * diff(mul(x1,u1),x1) + 0.1012 * diff(u1,x1)","add,add,u1,diff,mul,x1,u1,x1,diff,u1,x1",1.8310580267768843,False
+0.5456974606349101,1,0,"-0.5847 * diff(mul(u1,x1),x1) + 0.1012 * diff(u1,x1) + 0.5441 * u1","add,add,diff,mul,u1,x1,x1,diff,u1,x1,u1",1.8310580267768841,False
+0.5456974606349101,2,0,"0.5441 * u1 + -0.5847 * diff(mul(u1,x1),x1) + 0.1012 * diff(u1,x1)","add,add,u1,diff,mul,u1,x1,x1,diff,u1,x1",1.8310580267768843,False
+0.54567026695256,1,0,"-0.0403 * u1 + 0.1011 * diff(u1,x1) + -0.5846 * mul(diff(u1,x1),x1)","add,u1,add,diff,u1,x1,mul,diff,u1,x1,x1",1.8314752713292735,False
+0.5435956925455657,2,0,"-0.0033 * diff2(u1,x1) + -0.4154 * mul(diff(u1,x1),x1)","add,diff2,u1,x1,mul,diff,u1,x1,x1",1.9520042320685318,False
+0.543243341107789,1,0,"-0.0002 * diff3(u1,x1) + -0.2465 * mul(diff(u1,x1),add(x1,x1))","add,diff3,u1,x1,mul,diff,u1,x1,add,x1,x1",1.957694668811226,False
+0.543243341107789,3,0,"-0.0002 * diff3(u1,x1) + -0.4930 * mul(diff(u1,x1),x1)","add,diff3,u1,x1,mul,diff,u1,x1,x1",1.9576946688112262,False
+0.543243341107789,1,0,"-0.0002 * diff3(u1,x1) + -0.2465 * mul(diff(n2(x1),x1),diff(u1,x1))","add,diff3,u1,x1,mul,diff,n2,x1,x1,diff,u1,x1",1.957694668811226,False
+0.543243341107789,1,0,"-0.0002 * diff3(u1,x1) + -0.2465 * mul(add(diff(u1,x1),diff(u1,x1)),x1)","add,diff3,u1,x1,mul,add,diff,u1,x1,diff,u1,x1,x1",1.957694668811226,False
+0.5429778675248561,1,0,"0.0852 * diff(u1,x1) + -0.5173 * diff(mul(u1,x1),x1)","add,diff,u1,x1,diff,mul,u1,x1,x1",1.9619923959008732,False
+0.5429778675248561,4,0,"-0.5173 * diff(mul(u1,x1),x1) + 0.0852 * diff(u1,x1)","add,diff,mul,u1,x1,x1,diff,u1,x1",1.9619923959008723,False
+0.5429778675248561,2,0,"0.0852 * diff(u1,x1) + -0.5173 * diff(mul(x1,u1),x1)","add,diff,u1,x1,diff,mul,x1,u1,x1",1.9619923959008732,False
+0.5429778675248561,2,0,"-0.5173 * diff(mul(x1,u1),x1) + 0.0852 * diff(u1,x1)","add,diff,mul,x1,u1,x1,diff,u1,x1",1.9619923959008723,False
+0.5426028036959377,1,0,"-0.4072 * mul(add(mul(x1,mul(mul(u1,x1),x1)),diff(u1,x1)),x1)","mul,add,mul,x1,mul,mul,u1,x1,x1,diff,u1,x1,x1",2.059098682015034,False
+0.542601369795862,1,0,"-0.0350 * u1 + -0.4240 * diff(mul(x1,u1),x1) + -0.0049 * diff2(u1,x1)","add,u1,add,diff,mul,x1,u1,x1,diff2,u1,x1",1.8791402349399753,False
+0.542601359287136,1,0,"-0.0049 * diff2(u1,x1) + -0.4240 * mul(diff(u1,x1),x1) + -0.4590 * u1","add,add,diff2,u1,x1,mul,diff,u1,x1,x1,u1",1.8791404001350123,False
+0.5420486669094535,1,0,"-0.2022 * mul(add(mul(u1,x1),diff(u1,x1)),diff(n2(x1),x1))","mul,add,mul,u1,x1,diff,u1,x1,diff,n2,x1,x1",2.0684251828843503,False
+0.5420486669094535,1,0,"-0.4043 * mul(add(diff(u1,x1),mul(u1,x1)),x1)","mul,add,diff,u1,x1,mul,u1,x1,x1",2.0684251828843503,False
+0.5411930071613297,1,0,"-0.5829 * mul(x1,diff(u1,x1)) + -0.0008 * mul(u1,diff2(u1,x1)) + 0.1014 * diff(u1,x1) + -0.1521 * u1","add,add,add,mul,x1,diff,u1,x1,mul,u1,diff2,u1,x1,diff,u1,x1,u1",1.8137532659912106,False
+0.5411872742398741,1,0,"-0.2027 * mul(add(add(n3(mul(u1,n3(x1))),x1),x1),diff(u1,x1))","mul,add,add,n3,mul,u1,n3,x1,x1,x1,diff,u1,x1",2.0830029482460795,False
+0.5408794239638419,1,0,"-0.0161 * mul(add(diff3(mul(n3(x1),x1),x1),x1),diff(u1,x1))","mul,add,diff3,mul,n3,x1,x1,x1,x1,diff,u1,x1",2.088236560424427,False
+0.5408786286144152,7,0,"-0.2017 * mul(diff(n2(x1),x1),diff(u1,x1))","mul,diff,n2,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.0672 * mul(diff2(mul(mul(x1,x1),x1),x1),diff(u1,x1))","mul,diff2,mul,mul,x1,x1,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,2,0,"-0.2017 * mul(add(diff(u1,x1),diff(u1,x1)),x1)","mul,add,diff,u1,x1,diff,u1,x1,x1",2.0882500979966787,False
+0.5408786286144152,4,0,"-0.2017 * mul(diff(u1,x1),diff(mul(x1,x1),x1))","mul,diff,u1,x1,diff,mul,x1,x1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.4033 * mul(div(diff(n2(x1),x1),diff2(n2(x1),x1)),diff(u1,x1))","mul,div,diff,n2,x1,x1,diff2,n2,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,73,0,"-0.4033 * mul(x1,diff(u1,x1))","mul,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,4,0,"-0.2017 * mul(diff(u1,x1),diff(n2(x1),x1))","mul,diff,u1,x1,diff,n2,x1,x1",2.0882500979966787,False
+0.5408786286144152,77,0,"-0.4033 * mul(diff(u1,x1),x1)","mul,diff,u1,x1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.2017 * mul(diff(u1,x1),add(x1,x1))","mul,diff,u1,x1,add,x1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.2017 * mul(x1,add(diff(u1,x1),diff(u1,x1)))","mul,x1,add,diff,u1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.4033 * mul(add(x1,diff3(mul(x1,x1),x1)),diff(u1,x1))","mul,add,x1,diff3,mul,x1,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.1008 * mul(mul(n2(diff2(n2(x1),x1)),x1),diff(u1,x1))","mul,mul,n2,diff2,n2,x1,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,8,0,"-0.2017 * mul(diff(mul(x1,x1),x1),diff(u1,x1))","mul,diff,mul,x1,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5408786286144152,1,0,"-0.1008 * mul(add(diff(u1,x1),diff(u1,x1)),diff(mul(x1,x1),x1))","mul,add,diff,u1,x1,diff,u1,x1,diff,mul,x1,x1,x1",2.0882500979966787,False
+0.5408786286144152,2,0,"-0.0672 * mul(diff2(n3(x1),x1),diff(u1,x1))","mul,diff2,n3,x1,x1,diff,u1,x1",2.0882500979966787,False
+0.5407051745914917,1,0,"-0.2216 * mul(add(diff(u1,x1),mul(u1,diff(u1,x1))),x1)","mul,add,diff,u1,x1,mul,u1,diff,u1,x1,x1",2.091204443973345,False
+0.5406145943067208,1,0,"-0.2028 * mul(x1,add(u1,add(diff(u1,x1),diff(u1,x1))))","mul,x1,add,u1,add,diff,u1,x1,diff,u1,x1",2.092748831707954,False
+0.5406145943067208,1,0,"-0.2028 * mul(add(u1,add(diff(u1,x1),diff(u1,x1))),x1)","mul,add,u1,add,diff,u1,x1,diff,u1,x1,x1",2.092748831707954,False
+0.5406145943067208,1,0,"-0.2028 * mul(x1,add(add(u1,diff(u1,x1)),diff(u1,x1)))","mul,x1,add,add,u1,diff,u1,x1,diff,u1,x1",2.092748831707954,False
+0.5396844504993401,3,0,"-0.4028 * mul(x1,add(u1,diff(u1,x1)))","mul,x1,add,u1,diff,u1,x1",2.1086708173373103,False
+0.5396844504993401,3,0,"-0.4028 * mul(add(u1,diff(u1,x1)),x1)","mul,add,u1,diff,u1,x1,x1",2.1086708173373103,False
+0.5396844504993401,1,0,"-0.0671 * mul(diff2(n3(x1),x1),add(u1,diff(u1,x1)))","mul,diff2,n3,x1,x1,add,u1,diff,u1,x1",2.10867081733731,False
+0.5396844504993401,1,0,"-0.2014 * mul(add(x1,x1),add(u1,diff(u1,x1)))","mul,add,x1,x1,add,u1,diff,u1,x1",2.1086708173373103,False
+0.5396844504993401,3,0,"-0.4028 * mul(add(diff(u1,x1),u1),x1)","mul,add,diff,u1,x1,u1,x1",2.1086708173373103,False
+0.5396844504993401,1,0,"-0.0671 * mul(add(diff(u1,x1),u1),diff2(n3(x1),x1))","mul,add,diff,u1,x1,u1,diff2,n3,x1,x1",2.10867081733731,False
+0.5396844504993401,2,0,"-0.4028 * mul(x1,add(diff(u1,x1),u1))","mul,x1,add,diff,u1,x1,u1",2.1086708173373103,False
+0.5394533207841052,1,0,"-0.3973 * mul(add(mul(diff(n3(x1),x1),u1),diff(u1,x1)),x1)","mul,add,mul,diff,n3,x1,x1,u1,diff,u1,x1,x1",2.112645142879664,False
+0.5391504226842725,1,0,"-0.2009 * mul(add(diff(u1,x1),add(x1,diff(u1,x1))),x1)","mul,add,diff,u1,x1,add,x1,diff,u1,x1,x1",2.1178643740320977,False
+0.5391504226842725,2,0,"-0.2009 * mul(x1,add(diff(u1,x1),add(diff(u1,x1),x1)))","mul,x1,add,diff,u1,x1,add,diff,u1,x1,x1",2.1178643740320977,False
+0.5391204488793647,1,0,"-0.0016 * mul(n3(diff(u1,x1)),x1) + 0.1223 * diff(u1,x1)","add,mul,n3,diff,u1,x1,x1,diff,u1,x1",2.025456931614278,False
+0.5390158797689844,1,0,"-0.6891 * mul(x1,mul(add(x1,u1),mul(diff(u1,x1),x1)))","mul,x1,mul,add,x1,u1,mul,diff,u1,x1,x1",2.120186629237305,False
+0.5387533638931303,1,0,"-0.4046 * mul(add(diff(u1,x1),x1),x1) + -0.0033 * diff2(u1,x1)","add,mul,add,diff,u1,x1,x1,x1,diff2,u1,x1",2.0315968770419808,False
+0.5383955194403658,2,0,"-0.4285 * mul(diff(u1,x1),x1) + -0.0020 * n2(diff(u1,x1))","add,mul,diff,u1,x1,x1,n2,diff,u1,x1",2.037599284616716,False
+0.537969312520309,1,0,"-0.3106 * mul(add(diff(mul(u1,mul(x1,x1)),x1),diff(u1,x1)),x1)","mul,add,diff,mul,u1,mul,x1,x1,x1,diff,u1,x1,x1",2.1383340127563795,False
+0.5377559560163254,1,0,"0.4590 * u1 + -0.0002 * diff3(u1,x1) + -0.4933 * diff(mul(x1,u1),x1)","add,u1,add,diff3,u1,x1,diff,mul,x1,u1,x1",1.9567812950065373,False
+0.5377559560163254,1,0,"-0.4933 * diff(mul(x1,u1),x1) + 0.4590 * u1 + -0.0002 * diff3(u1,x1)","add,add,diff,mul,x1,u1,x1,u1,diff3,u1,x1",1.9567812950065373,False
+0.5376417134452757,1,0,"0.0001 * diff3(mul(u1,x1),x1) + -0.4990 * diff(mul(u1,x1),x1) + 0.0870 * diff(u1,x1)","add,add,diff3,mul,u1,x1,x1,diff,mul,u1,x1,x1,diff,u1,x1",1.9586479048242824,False
+0.537555967314841,1,0,"-0.3415 * mul(add(mul(diff(n3(mul(u1,x1)),x1),x1),diff(u1,x1)),x1)","mul,add,mul,diff,n3,mul,u1,x1,x1,x1,diff,u1,x1,x1",2.145542225010342,False
+0.5375172162799812,2,0,"-0.4478 * diff(mul(x1,u1),x1) + -0.0001 * diff3(u1,x1)","add,diff,mul,x1,u1,x1,diff3,u1,x1",2.0524033208632746,False
+0.5375172162799812,2,0,"-0.4478 * diff(mul(u1,x1),x1) + -0.0001 * diff3(u1,x1)","add,diff,mul,u1,x1,x1,diff3,u1,x1",2.0524033208632746,False
+0.5375172162799812,5,0,"-0.0001 * diff3(u1,x1) + -0.4478 * diff(mul(x1,u1),x1)","add,diff3,u1,x1,diff,mul,x1,u1,x1",2.0524033208632746,False
+0.5373965330749296,1,0,"-0.0631 * mul(mul(x1,diff3(mul(n2(x1),x1),x1)),add(mul(x1,x1),diff(u1,x1)))","mul,mul,x1,diff3,mul,n2,x1,x1,x1,add,mul,x1,x1,diff,u1,x1",2.1483287636468935,False
+0.5373965330749296,2,0,"-0.3788 * mul(add(n2(x1),diff(u1,x1)),x1)","mul,add,n2,x1,diff,u1,x1,x1",2.1483287636468935,False
+0.5373777281614058,1,0,"-0.0020 * diff3(mul(x1,mul(n3(x1),u1)),x1) + -0.4143 * mul(diff(u1,x1),x1)","add,diff3,mul,x1,mul,n3,x1,u1,x1,mul,diff,u1,x1,x1",2.054763825046901,False
+0.5371195079335233,183,0,"-0.3755 * diff(mul(u1,x1),x1)","diff,mul,u1,x1,x1",2.1531787578689134,False
+0.5371195079335233,203,0,"-0.3755 * diff(mul(x1,u1),x1)","diff,mul,x1,u1,x1",2.1531787578689134,False
+0.5365502385568452,1,0,"-0.1965 * mul(add(diff(u1,x1),x1),diff(mul(x1,x1),x1))","mul,add,diff,u1,x1,x1,diff,mul,x1,x1,x1",2.1631781231364227,False
+0.5365502385568452,4,0,"-0.3930 * mul(x1,add(x1,diff(u1,x1)))","mul,x1,add,x1,diff,u1,x1",2.1631781231364227,False
+0.5365502385568452,1,0,"-0.1965 * mul(diff2(mul(x1,x1),x1),mul(x1,add(diff(u1,x1),x1)))","mul,diff2,mul,x1,x1,x1,mul,x1,add,diff,u1,x1,x1",2.1631781231364227,False
+0.5365502385568452,3,0,"-0.3930 * mul(add(diff(u1,x1),x1),x1)","mul,add,diff,u1,x1,x1,x1",2.1631781231364227,False
+0.5365502385568452,2,0,"-0.3930 * mul(add(x1,diff(u1,x1)),x1)","mul,add,x1,diff,u1,x1,x1",2.1631781231364227,False
+0.53631106868919,1,0,"-0.3959 * diff(mul(x1,u1),x1) + -0.0007 * diff2(n2(u1),x1)","add,diff,mul,x1,u1,x1,diff2,n2,u1,x1",2.0729001345631066,False
+0.5360276550705155,1,0,"-0.3817 * mul(add(n3(u1),diff(u1,x1)),x1)","mul,add,n3,u1,diff,u1,x1,x1",2.172396590720971,False
+0.5359119850759748,1,0,"-0.0002 * diff2(mul(mul(n2(u1),u1),x1),x1) + -0.4047 * mul(diff(u1,x1),x1)","add,diff2,mul,mul,n2,u1,u1,x1,x1,mul,diff,u1,x1,x1",2.0797248304458056,False
+0.5358448825299287,1,0,"-0.3959 * mul(x1,add(add(u1,diff(u1,x1)),x1))","mul,x1,add,add,u1,diff,u1,x1,x1",2.175629609735232,False
+0.5357543463704945,1,0,"0.1714 * n3(u1) + -0.3939 * diff(mul(x1,u1),x1)","add,n3,u1,diff,mul,x1,u1,x1",2.0824264925204568,False
+0.5357543463704945,1,0,"-0.3939 * diff(mul(x1,u1),x1) + 0.1714 * n3(u1)","add,diff,mul,x1,u1,x1,n3,u1",2.0824264925204568,False
+0.5356894155838835,1,0,"0.0436 * n3(u1) + -0.4023 * mul(x1,diff(u1,x1))","add,n3,u1,mul,x1,diff,u1,x1",2.083540269459069,False
+0.5356434358905798,1,0,"-0.1386 * mul(x1,add(diff(u1,x1),diff(n2(u1),x1)))","mul,x1,add,diff,u1,x1,diff,n2,u1,x1",2.1791982942973562,False
+0.5356434358905798,1,0,"-0.0693 * mul(add(diff(n2(u1),x1),diff(u1,x1)),diff(n2(x1),x1))","mul,add,diff,n2,u1,x1,diff,u1,x1,diff,n2,x1,x1",2.1791982942973562,False
+0.5355010719641605,1,0,"0.0029 * diff2(mul(u1,n3(mul(x1,n2(x1)))),x1) + -0.4011 * mul(diff(u1,x1),x1)","add,diff2,mul,u1,n3,mul,x1,n2,x1,x1,mul,diff,u1,x1,x1",2.086774197123823,False

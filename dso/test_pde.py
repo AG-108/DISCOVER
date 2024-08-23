@@ -13,10 +13,12 @@ warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 if __name__  == "__main__":
     warnings.filterwarnings('ignore', 'Intel MKL ERROR')
     pde = sys.argv[1]
-    folder  = sys.argv[2]
+    folder = sys.argv[2]
 
     # build model by passing the path of user-defined config file. 
     model = DeepSymbolicOptimizer_PDE(f"./dso/config/{folder}/config_pde_{pde}.json")
+
+
     
     # model training
     start = time.time()

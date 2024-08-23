@@ -46,7 +46,8 @@ def python_execute(traversal, u, x):
                 apply_stack[-1].append(intermediate_result)
             else:
                 return intermediate_result  
-         
+
+
 def python_execute_torch(traversal, u, x):
     apply_stack = []
     dim_flag = None
@@ -96,9 +97,11 @@ def python_execute_torch(traversal, u, x):
             if len(apply_stack) != 1:
                 apply_stack.pop()
                 apply_stack[-1].append(intermediate_result)
+
             else:
                 return intermediate_result  
-          
+
+
 def python_execute_old(traversal, u, x):
     apply_stack = []
   
@@ -122,6 +125,7 @@ def python_execute_old(traversal, u, x):
                 apply_stack[-1].append(intermediate_result)
             else:
                 return intermediate_result  
+
 
 def cython_execute(traversal, X):
     """
