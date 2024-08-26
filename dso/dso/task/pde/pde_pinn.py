@@ -5,7 +5,8 @@ from dso.task.pde.data_load import *
 from dso.task.pde.utils_nn import plot_field, plot_ut,torch_diff
 from dso.task.pde.utils_noise import *
 from dso.task.pde.utils_v1 import FiniteDiff, Diff, Diff2 ,Diff4
-from dso.task.pde.wpde_pinn import WeakEvaluate
+# Don't try to merge with the same class in wpde_pinn; that will trigger loop import
+from dso.task.pde.weak_form import WeakEvaluate
 
 
 class PDEPINNTask(PDETask):
