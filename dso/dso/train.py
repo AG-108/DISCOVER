@@ -377,13 +377,16 @@ def learn(sess, controller, pool, gp_controller, gp_aggregator, pinn_model, outp
         # r_max = np.max(r)
         # r_best = max(r_max, r_best)
         quantile = np.min(r)
-        valid_full1 = invalid_full ==False
-        valid_full2 = r_full >0
+        valid_full1 = invalid_full == False
+        valid_full2 = r_full > 0
         valid_full = np.logical_and(valid_full1, valid_full2)
         r_full_valid = r_full[valid_full]
         r_full = r_full[valid_full2]
         l_full= l_full[valid_full]
-        
+
+        import pdb;pdb.set_trace()
+        assert False, 'Test'
+
         r_max = np.max(r_full_valid)
         r_best = max(r_max, r_best)
        

@@ -1,21 +1,11 @@
-import numpy as np
-from scipy.special.orthogonal import p_roots
 from numpy.polynomial.legendre  import leggauss
-import torch
-import pandas as pd
-import scipy.io as scio
-import math
 
-
-from dso.task.pde.pde import PDETask, make_pde_metric
-from dso.library import Library
-from dso.functions import create_tokens,add_torch_tokens
 from dso.task.pde.data_load import *
-from dso.task.pde.utils_nn import load_noise_data,plot_field, plot_ut,torch_diff
+from dso.task.pde.utils_nn import torch_diff
 from dso.task.pde.utils_noise import *
-from dso.task.pde.utils_v1 import FiniteDiff, Diff, Diff2 ,Diff4
-from dso.task.pde.utils_nn import ANN, PDEDataset,np2tensor, tensor2np
+from dso.task.pde.utils_nn import np2tensor, tensor2np
 from dso.task.pde.pde_pinn import PDEPINNTask
+
 
 class WeakEvaluate:
     def __init__(self, n = 5, L = 2, x_low= 20, t_low=20, x_up=80, t_up=80, x_num=1200, t_num=300):
@@ -72,6 +62,7 @@ class WeakEvaluate:
 
 def f(x):
     return x
+
 class WeakPDEPINNTask(PDEPINNTask):
     """
     Class for the symbolic regression task. Discrete objects are expressions,

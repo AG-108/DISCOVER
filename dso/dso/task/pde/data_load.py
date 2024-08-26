@@ -231,15 +231,12 @@ def load_data(dataset, noise_level=0, data_amount=1, training=False, cut_ratio=0
     else:
         assert False, "Unknown dataset"
 
-    n, m = u.shape
-    ut = np.zeros((n, m))
     dt = t[1] - t[0]
     X.append(x)
 
     print("noise level:", noise_level)
 
-    for idx in range(n):
-        ut[idx, :] = FiniteDiff(u[idx, :], dt)
+    ut = central_diff(u, dt, axis=1)
 
     if noise_level > 0 and training:
         # ut = ut[math.floor(n*0.1):math.ceil(n*0.9), math.floor(m*0.1):math.ceil(m*0.9)]

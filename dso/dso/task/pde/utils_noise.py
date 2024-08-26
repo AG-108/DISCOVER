@@ -1,5 +1,4 @@
 import numpy as np
-# import torch.
 import torch
 import scipy
 from pyDOE import lhs
@@ -13,11 +12,8 @@ def cut_bound_quantile(x, t, quantile=0.1):
     up_x,up_t = [np.quantile(x[i],1-quantile, axis =0) for i in range(len(x))], np.quantile(t,1-quantile,axis =0)
     x_dim = len(low_x)
     x_len = len(x[0])
-    x_limit = np.ones(x_len, dtype=np.bool) 
-    # import pdb;pdb.set_trace()
+    x_limit = np.ones(x_len, dtype=np.bool)
     for i in range(x_dim):
-        
-        # x_limit_cur = np.logical_and(x[:,i]>low_x,x[:,i]<up_x)
         x_limit_cur = np.logical_and(x[i][:,0]>low_x[i],x[i][:,0]<up_x[i])
         x_limit = np.logical_and(x_limit_cur, x_limit)
         
@@ -29,17 +25,16 @@ def cut_bound_quantile(x, t, quantile=0.1):
     return x, t
 
 def cut_bound(result,percent, test=False):
-    # import pdb;pdb.set_trace()
     r_shape = result.shape
     low_bound = [ math.floor(percent*dim) for dim in r_shape ]
     up_bound = [ math.ceil((1-percent)*dim) for dim in r_shape ]
-    if len(r_shape)==2:
-        result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1]]
-        # result = result[5:-5,5:-5]
-    elif len(r_shape) == 3:
-        result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1], low_bound[2]:up_bound[2]]
-    elif len(r_shape) == 4:
-        result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1], low_bound[2]:up_bound[2],low_bound[3]:up_bound[3]]
+    result = result[tuple(slice(low_bound[i], up_bound[i]) for i in range(len(r_shape)))]
+    # if len(r_shape)==2:
+    #     result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1]]
+    # elif len(r_shape) == 3:
+    #     result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1], low_bound[2]:up_bound[2]]
+    # elif len(r_shape) == 4:
+    #     result = result[low_bound[0]:up_bound[0],low_bound[1]:up_bound[1], low_bound[2]:up_bound[2],low_bound[3]:up_bound[3]]
 
     return result           
 
