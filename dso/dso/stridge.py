@@ -116,6 +116,23 @@ def build_tree_new(traversal):
     return node
 
 
+def cut_subtree_str(traversal, index):
+    ##############################################
+    # cut the subtree from the traversal
+    # Args:
+    #     traversal (list): list of tokens
+    #     node (Token):  node to be cut
+    ##############################################
+    if not traversal:
+        return []
+    arity_sum = traversal[index].arity
+    for j, child in enumerate(traversal[index + 1:]):
+        arity_sum += child.arity - 1
+        if arity_sum == 0:
+            return repr(traversal[index:j + 1])
+    return repr(traversal)
+
+
 illegal_type = ['no_u', 'spatial_error', 'depth_limit']
 
 
@@ -142,7 +159,8 @@ class Regulations(object):
 
         return omit_list1 + omit_list2, error_list1 + error_list2
 
-    def check_spatial_regulation(self, x, traversal):
+    @staticmethod
+    def check_spatial_regulation(x, traversal):
         ##############################################
         # check the spatial regulation
         # ensure that the derivative terms are in the same dimension, ex. d^2/dx1^2 d^2/dx1dx2
@@ -167,10 +185,12 @@ class Regulations(object):
         omit_list = []
         error_list = []
         for i, traversal in enumerate(terms_token):
-            if ('diff' in repr(traversal) or 'Diff' in repr(traversal)) and ', u' not in repr(traversal):
-                error_list.append('no_u')
-                omit_list.append(i)
-
+            for j, node in enumerate(traversal):
+                if 'Diff' in node.name or 'diff' in node.name:
+                    subtreestr = cut_subtree_str(traversal, j)
+                    if ', u' not in subtreestr:
+                        error_list.append('no_u')
+                        omit_list.append(i)
             if depth[i] > self.max_depth:
                 error_list.append('depth_limit')
                 omit_list.append(i)
@@ -197,11 +217,16 @@ class STRidge(object):
     conduct sparse regression and calculate the coefficients
     """
 
-    def __init__(self, traversal, default_terms=[], noise_level=0,
+    def __init__(self, traversal, default_terms=None, noise_level=0,
                  max_depth=4,
                  cut_ratio=0.02,
                  spatial_error=False,
                  const=False):
+        self.terms_token = []
+        self.terms_len = []
+        self.depth = []
+        if default_terms is None:
+            default_terms = []
         self.traversal = traversal
         self.traversal_copy = traversal.copy()
         # self.set_execute_function()
@@ -299,7 +324,8 @@ class STRidge(object):
         # self.depth = [max_depth(node) for node in self.terms]
         self.depth = [np.ceil(math.log(length, 2)) for length in self.terms_len]
 
-    def build_tree(self, traversal):
+    @staticmethod
+    def build_tree(traversal):
         stack = []
         leaf_node = None
         while len(traversal) != 0:
@@ -410,7 +436,11 @@ class STRidge(object):
 
         # filter the invalid terms
         omit_list, err_list = self.regulation.apply_regulations(x,
-                                    self.traversal_copy, self.terms_token, self.depth)
+                                                                self.traversal_copy, self.terms_token, self.depth)
+        omit_terms = []
+        omit_terms.extend(omit_list)
+        omit_terms = set(omit_terms)
+
         if len(err_list) > 0:
             invalid = True
             return 0, [0], invalid, '+'.join(err_list), '+'.join(err_list), None
@@ -441,9 +471,6 @@ class STRidge(object):
                     return 0, [0], invalid, 'dim_error', 'dim_error', None
 
         # coefficients filter
-        omit_terms = []
-        omit_terms.extend(omit_list)
-        omit_terms = set(omit_terms)
 
         if len(omit_terms) > 0:
             terms_token = [self.terms_token[i] for i in range(len(self.terms_token)) if i not in omit_terms]
@@ -500,14 +527,15 @@ class STRidge(object):
         return y_hat, w_best, False, None, None, rhs
 
     def multi_coef_calculate(self, results, uts, cached_terms=(None, None)):
-        """
-        multi-dataset for subgrid force term prediction
-        
-
-        Args:
-            results (_type_):  list =  lev [(txy), ...]
-            uts (_type_): q subgrid force shape = (t, lev, x, y)
-        """
+        ##############################################
+        # multi-dataset for subgrid force term prediction
+        # Args:
+        #    results (list):  list =  lev [(txy), ...]
+        #    uts (_type_): q subgrid force shape = (t, lev, x, y)
+        #    cached_terms (_type_):  cached terms for the calculation
+        # Returns:
+        #    y_hat_list (_type_):  list of y_hat for each lev
+        ##############################################
         # subgrid
 
         assert len(uts) == len(results)

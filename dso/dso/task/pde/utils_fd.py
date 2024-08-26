@@ -1,11 +1,9 @@
 import numpy  as  np
 
 def FiniteDiff(u, dx):
-    
     n = u.size
     ux = np.zeros(n)
 
-    # for i in range(1, n - 1):
     ux[1:n-1] = (u[2:n] - u[0:n-2]) / (2 * dx)
 
     ux[0] = (-3.0 / 2 * u[0] + 2 * u[1] - u[2] / 2) / dx
