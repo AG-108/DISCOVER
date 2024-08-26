@@ -1,8 +1,0 @@
-complexity,r,count_on_policy,count_off_policy,expression,traversal,nmse_test,success
-3,0.49636702529221105,97,0,"0.2036 * mul(u1,u1)","mul,u1,u1",2.995416319889946,False
-4,0.497546997204975,2564,0,"-0.0376 * diff(u1,x1)","diff,u1,x1",2.9669899283703955,False
-5,0.49949910738782927,1,0,"0.6117 * mul(x1,add(x1,u1))","mul,x1,add,x1,u1",2.920551590940686,False
-6,0.5408786286144152,77,0,"-0.4033 * mul(diff(u1,x1),x1)","mul,diff,u1,x1,x1",2.0882500979966787,False
-10,0.5420486669094535,1,0,"-0.4043 * mul(add(diff(u1,x1),mul(u1,x1)),x1)","mul,add,diff,u1,x1,mul,u1,x1,x1",2.0684251828843503,False
-11,0.5512423287031272,2,0,"0.1010 * diff(u1,x1) + -0.5842 * mul(diff(u1,x1),x1)","add,diff,u1,x1,mul,diff,u1,x1,x1",1.832286579996201,False
-13,0.9727804001854877,4,0,"-1.0006 * mul(u1,diff(u1,x1)) + -0.0025 * diff3(u1,x1)","add,mul,u1,diff,u1,x1,diff3,u1,x1",0.00016682123727951648,True
