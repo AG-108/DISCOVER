@@ -98,8 +98,7 @@ def Diff4(u, dxt, dim, name='x'):
         uxt = Diff2(u, dxt, dim, name)
         uxt = Diff2(uxt, dxt, dim, name)
     else:
-        assert False
-        NotImplementedError()
+        raise NotImplementedError()
 
     return uxt
 

@@ -235,6 +235,7 @@ class Program(object):
         """
         
         # Can be empty if we are unpickling 
+        self.STRidge = None
         if tokens is not None:
             self._init(tokens, on_policy)
     

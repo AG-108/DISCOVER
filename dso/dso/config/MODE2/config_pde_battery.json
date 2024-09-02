@@ -25,6 +25,7 @@
       "duration":500,
       // data
       "data_ratio":0.04,
+      "data_type":"2D_2U",
       "noise":0.5,
       "coll_data":50000,
       "generation_type": "AD"

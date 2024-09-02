@@ -1,14 +1,9 @@
-"""Load full simulation data of multi-dimenisonal systems. 
 """
-import numpy as np
+Load full simulation data of multi-dimenisonal systems.
+"""
 import scipy.io as scio
-import scipy
-import pickle
-import math
-from sklearn.metrics import mean_squared_error
 from scipy.integrate import odeint
-from numpy.fft import fft, ifft, fftfreq
-from time import time
+from numpy.fft import fftfreq
 
 from dso.task.pde.utils_v1 import *
 from dso.task.pde.utils_v2 import *

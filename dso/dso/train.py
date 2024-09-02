@@ -343,7 +343,7 @@ def learn(sess, controller, pool, gp_controller, gp_aggregator, pinn_model, outp
 
         l           = np.array([len(p.traversal) for p in programs])
         s           = [p.str for p in programs] # Str representations of Programs
-        s_str = [p.str_expression for p in programs] 
+        s_str       = [p.str_expression for p in programs]
         
         on_policy   = np.array([p.originally_on_policy for p in programs])
         invalid     = np.array([p.invalid for p in programs], dtype=bool)
@@ -380,12 +380,13 @@ def learn(sess, controller, pool, gp_controller, gp_aggregator, pinn_model, outp
         valid_full1 = invalid_full == False
         valid_full2 = r_full > 0
         valid_full = np.logical_and(valid_full1, valid_full2)
+
+        # import pdb;pdb.set_trace()
+        # assert False, 'Test'
+
         r_full_valid = r_full[valid_full]
         r_full = r_full[valid_full2]
         l_full= l_full[valid_full]
-
-        import pdb;pdb.set_trace()
-        assert False, 'Test'
 
         r_max = np.max(r_full_valid)
         r_best = max(r_max, r_best)
