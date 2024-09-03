@@ -354,7 +354,7 @@ class Controller(object):
             with tf.variable_scope('policy', reuse=True):
                 logits, _ = tf.nn.dynamic_rnn(cell=cell,
                                               inputs=state_manager.get_tensor_input(B.obs),
-                                              sequence_length=B.lengths, # Backpropagates only through sequence length
+                                              sequence_length=B.lengths, # Back-propagate only through sequence length
                                               dtype=tf.float32)
             # import pdb;pdb.set_trace()
             logits += B.priors

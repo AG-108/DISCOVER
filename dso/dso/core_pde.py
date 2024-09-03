@@ -12,6 +12,11 @@ import tensorflow as tf
 import commentjson as json
 import torch
 
+#####################
+# DO NOT DELETE ROW 18! OTHERWISE, LOOP IMPORT ERROR WILL OCCUR
+#####################
+from dso.task import set_task
+
 from dso.controller import Controller
 from dso.train import learn
 from dso.prior import make_prior
@@ -32,13 +37,31 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
 
     Parameters
     ----------
-    config : dict or str
+    config : dict
         Config dictionary or path to JSON.
 
     Attributes
     ----------
-    config : dict
+    config_task : dict
+        Configuration parameters for task.
+    config_prior : dict
+        Configuration parameters for prior.
+    config_training : dict
         Configuration parameters for training.
+    config_state_manager : dict
+        Configuration parameters for state manager.
+    config_controller : dict
+        Configuration parameters for controller.
+    config_gp_meld : dict
+        Configuration parameters for GP meld.
+    config_experiment : dict
+        Configuration parameters for experiment.
+    config_pinn : dict
+        Configuration parameters for PINN.
+    config_param : dict
+        Configuration parameters for parameterized.
+    config_gp_agg : dict
+        Configuration parameters for GP aggregator.
 
     Methods
     -------
@@ -47,31 +70,28 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
     """
 
     def __init__(self, config=None, pde_config=None):
-        self.set_config(config, pde_config)
+        config = load_config(config)
+        if pde_config is not None:
+            config = safe_merge_dicts(config, pde_config)
+
+        self.config = defaultdict(dict, config)
+        self.config_task = self.config["task"]
+        self.config_prior = self.config["prior"]
+        self.config_training = self.config["training"]
+        self.config_state_manager = self.config["state_manager"]
+        self.config_controller = self.config["controller"]
+        self.config_gp_meld = self.config["gp_meld"]
+        self.config_experiment = self.config["experiment"]
+        self.config_pinn = self.config["pinn"]
+        self.config_param = self.config['parameterized']
+        self.config_gp_agg = self.config["gp_agg"]
+
         _, file_name = os.path.split(config)
         self.job_name = file_name.split('.j')[0]
         self.sess = None
 
-    def setup(self, ):
-
-        # Clear the cache and reset the compute graph
-        Program.clear_cache()
-        tf.reset_default_graph()
-
-        # Generate objects needed for training and set seeds
-        self.pool = self.make_pool_and_set_task()
-        self.set_seeds()  # Must be called _after_ resetting graph and _after_ setting task
-        self.sess = tf.Session()
-
-        # Save complete configuration file
-        self.output_file = self.make_output_file()
-        self.save_config()
-
-        # Prepare training parameters
-        self.prior = self.make_prior()
-        self.state_manager = self.make_state_manager()
-        self.controller = self.make_controller()
-        self.gp_controller = self.make_gp_controller()
+    def setup(self):
+        super().setup()
         self.denoise_pinn = self.make_pinn_model()
         self.gp_aggregator = self.make_gp_aggregator()
 
@@ -209,7 +229,7 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
         best_p = result['program']
 
         self.denoise_pinn.train_pinn_cv(best_p, coef=self.config_pinn['coef_pde'])
-        Program.reset_task(self.denoise_pinn)
+        Program.reset_task(self.denoise_pinn, self.config_pinn['generation_type'])
         self.reset_up()
         result = self.callLearn()
         return result
@@ -240,6 +260,7 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
 
     def residual_training(self):
         reset = True
+        result = None
         for i in range(self.config_param['iter']):
             print(f"***********The {i}th iteration*********** ")
             result = self.callLearn()
@@ -259,40 +280,6 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
         print([repr(t) for t in terms])
         print(w_best)
         return result
-
-    def set_config(self, config, pde_config):
-        config = load_config(config)
-        if pde_config is not None:
-            config = safe_merge_dicts(config, pde_config)
-
-        self.config = defaultdict(dict, config)
-        self.config_task = self.config["task"]
-        self.config_prior = self.config["prior"]
-        self.config_training = self.config["training"]
-        self.config_state_manager = self.config["state_manager"]
-        self.config_controller = self.config["controller"]
-        self.config_gp_meld = self.config["gp_meld"]
-        self.config_experiment = self.config["experiment"]
-        self.config_pinn = self.config["pinn"]
-        self.config_param = self.config['parameterized']
-        self.config_gp_agg = self.config["gp_agg"]
-
-    def save_config(self):
-        # Save the config file
-        if self.output_file is not None:
-            path = os.path.join(self.config_experiment["save_path"],
-                                "config.json")
-            # With run.py, config.json may already exist. To avoid race
-            # conditions, only record the starting seed. Use a backup seed
-            # in case this worker's seed differs.
-            backup_seed = self.config_experiment["seed"]
-            if not os.path.exists(path):
-                if "starting_seed" in self.config_experiment:
-                    self.config_experiment["seed"] = self.config_experiment["starting_seed"]
-                    del self.config_experiment["starting_seed"]
-                with open(path, 'w') as f:
-                    json.dump(self.config, f, indent=3)
-            self.config_experiment["seed"] = backup_seed
 
     def set_seeds(self, new_seed=None):
         """
@@ -351,10 +338,11 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
 
     def make_gp_controller(self):
         if self.config_gp_meld.pop("run_gp_meld", False):
-            from dso.gp.gp_controller import GPController
-            gp_controller = GPController(self.prior,
-                                         self.pool,
-                                         **self.config_gp_meld)
+            # from dso.gp.gp_controller import GPController
+            # gp_controller = GPController(self.prior,
+            #                              self.pool,
+            #                              **self.config_gp_meld)
+            gp_controller = None
         else:
             gp_controller = None
 

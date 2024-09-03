@@ -7,7 +7,7 @@ import numpy as np
 import dso.utils as U
 
 
-class Token():
+class Token:
     """
     An arbitrary token or "building block" of a Program object.
 
@@ -23,7 +23,7 @@ class Token():
         Complexity of token.
 
     function : callable
-        Function associated with the token; used for exectuable Programs.
+        Function associated with the token; used for executable Programs.
 
     input_var : int or None
         Index of input if this Token is an input variable, otherwise None.
@@ -61,7 +61,7 @@ class HardCodedConstant(Token):
 
     Parameters
     ----------
-    value : float
+    value : np.ndarray
         Value of the constant.
     """
 
@@ -85,7 +85,7 @@ class PlaceholderConstant(Token):
 
     Parameters
     ----------
-    value : float or None
+    value : np.ndarray or None
         Current value of the constant, or None if not yet set.
     """
 
@@ -106,7 +106,7 @@ class PlaceholderConstant(Token):
         return str(self.value[0])
 
 
-class Library():
+class Library:
     """
     Library of Tokens. We use a list of Tokens (instead of set or dict) since
     we so often index by integers given by the Controller.
@@ -125,6 +125,8 @@ class Library():
 
     def __init__(self, tokens):
 
+        self.subgrid_tokens = None
+        self.torch_tokens = None
         self.tokens = tokens
         self.L = len(tokens)
         self.names = [t.name for t in tokens]
@@ -200,9 +202,9 @@ class Library():
             "sqrt" : "n2",
             "n2" : "sqrt"
         }
-        diff_inverse_tokens = {
-            "diff":"diff2"
-        }
+        # diff_inverse_tokens = {
+        #     "diff":"diff2"
+        # }
         token_from_name = {t.name : i for i, t in enumerate(self.tokens)}
         self.inverse_tokens = {token_from_name[k] : token_from_name[v] for k, v in inverse_tokens.items() if k in token_from_name and v in token_from_name}        
 

@@ -121,6 +121,7 @@ class HierarchicalTask(Task):
 
     def __init__(self):
         super(Task).__init__()
+        self.prior = None
 
     def get_next_obs(self, actions, obs):
 
@@ -144,7 +145,7 @@ class HierarchicalTask(Task):
         prior = self.prior(actions, parent, sibling, dangling) # (?, n_choices)
 
         # Reset initial values when tree completes
-        if Program.n_objects > 1: # NOTE: do this to save computuational cost only when n_objects > 1
+        if Program.n_objects > 1: # NOTE: do this to save computational cost only when n_objects > 1
             finished = (dangling == 0)
             dangling[finished] = 1
             action[finished] = lib.EMPTY_ACTION

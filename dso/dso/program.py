@@ -8,17 +8,15 @@ from textwrap import indent
 import numpy as np
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import pretty
-import time
 
 from dso.functions import PlaceholderConstant
-from dso.const import make_const_optimizer,ScipyMinimize
+from dso.const import make_const_optimizer, ScipyMinimize
 from dso.utils import cached_property
 import dso.utils as U
-from dso.stridge import STRidge,Regulations,Node,build_tree,unsafe_execute_torch,unsafe_execute
+from dso.stridge import STRidge, Node, build_tree, unsafe_execute_torch, unsafe_execute
 
 
 def _finish_tokens(tokens):
-
     """
     Complete a possibly unfinished string of tokens.
 
@@ -38,7 +36,6 @@ def _finish_tokens(tokens):
     """
 
     n_objects = Program.n_objects
-    # import pdb;pdb.set_trace()
     arities = np.array([Program.library.arities[t] for t in tokens])
     # Number of dangling nodes, returns the cumsum up to each point
     # Note that terminal nodes are -1 while functions will be >= 0 since arities - 1
@@ -53,7 +50,7 @@ def _finish_tokens(tokens):
         # NOTE: This only appends onto the end of a set of tokens, even in the multi-object case!
         assert n_objects == 1, "Is max length constraint turned on? Max length constraint required when n_objects > 1."
         tokens = np.append(tokens, np.random.choice(Program.library.input_tokens, size=dangling[-1]))
-        
+
     return tokens
 
 
@@ -109,7 +106,6 @@ def from_str_tokens(str_tokens, skip_cache=False):
 
 
 def from_tokens(tokens, skip_cache=False, on_policy=True, finish_tokens=True):
-
     """
     Memoized function to generate a Program from a list of tokens.
 
@@ -142,7 +138,7 @@ def from_tokens(tokens, skip_cache=False, on_policy=True, finish_tokens=True):
     '''
         Truncate expressions that complete early; extend ones that don't complete
     '''
-  
+
     if finish_tokens:
         tokens = _finish_tokens(tokens)
 
@@ -153,7 +149,7 @@ def from_tokens(tokens, skip_cache=False, on_policy=True, finish_tokens=True):
     if skip_cache or Program.task.stochastic:
         p = Program(tokens, on_policy=on_policy)
     else:
-        key = tokens.tostring() 
+        key = tokens.tostring()
         try:
             p = Program.cache[key]
             if on_policy:
@@ -215,37 +211,38 @@ class Program(object):
     """
 
     # Static variables
-    task = None             # Task
-    library = None          # Library
+    task = None  # Task
+    library = None  # Library
     const_optimizer = None  # Function to optimize constants
     cache = {}
-    n_objects = 1          # Number of executable objects per Program instance
+    n_objects = 1  # Number of executable objects per Program instance
 
-    default_terms=[]
+    default_terms = []
     # Cython-related static variables
-    have_cython = None      # Do we have cython installed
-    execute = None          # Link to execute. Either cython or python
-    cyfunc = None           # Link to cyfunc lib since we do an include inline
+    have_cython = None  # Do we have cython installed
+    execute = None  # Link to execute. Either cython or python
+    cyfunc = None  # Link to cyfunc lib since we do an include inline
 
-    function_terms = {} #cache the bst reward sample function terms
+    function_terms = {}  # cache the bst reward sample function terms
     reward_list = []
+
     def __init__(self, tokens=None, on_policy=True):
         """
         Builds the Program from a list of of integers corresponding to Tokens.
         """
-        
+
         # Can be empty if we are unpickling 
         self.STRidge = None
         if tokens is not None:
             self._init(tokens, on_policy)
-    
+
     def _init(self, tokens, on_policy=True):
 
         self.traversal = [Program.library[t] for t in tokens]
         self.default_terms = [[Program.library[t]] for term in Program.default_terms for t in term]
         # import pdb;pdb.set_trace()
         self.set_stridge()
-        
+
         self.const_pos = [i for i, t in enumerate(self.traversal) if isinstance(t, PlaceholderConstant)]
         self.len_traversal = len(self.traversal)
 
@@ -258,73 +255,74 @@ class Program(object):
 
         self.on_policy_count = 1 if on_policy else 0
         self.off_policy_count = 0 if on_policy else 1
-        self.originally_on_policy = on_policy # Note if a program was created on policy
+        self.originally_on_policy = on_policy  # Note if a program was created on policy
         if Program.n_objects > 1:
-                # Fill list of multi-traversals
+            # Fill list of multi-traversals
             danglings = -1 * np.arange(1, Program.n_objects + 1)
-            self.traversals = [] # list to keep track of each multi-traversal
+            self.traversals = []  # list to keep track of each multi-traversal
             i_prev = 0
-            arity_list = [] # list of arities for each node in the overall traversal
+            arity_list = []  # list of arities for each node in the overall traversal
             for i, token in enumerate(self.traversal):
                 arities = token.arity
                 arity_list.append(arities)
                 dangling = 1 + np.cumsum(np.array(arity_list) - 1)[-1]
                 if (dangling - 1) in danglings:
-                    trav_object = self.traversal[i_prev:i+1]
+                    trav_object = self.traversal[i_prev:i + 1]
                     self.traversals.append(trav_object)
-                    i_prev = i+1
+                    i_prev = i + 1
                     """
                     Keep only what dangling values have not yet been calculated. Don't want dangling to go down and up (e.g hits -1, goes back up to 0 before hitting -2)
                     and trigger the end of a traversal at the wrong time
                     """
-                    danglings = danglings[danglings != dangling - 1] 
-    
+                    danglings = danglings[danglings != dangling - 1]
+
     def set_stridge(self):
-        self.STRidge = STRidge(self.traversal.copy(),self.default_terms,
-                            noise_level=Program.task.noise_level, 
-                            max_depth=Program.task.max_depth,
-                            cut_ratio=Program.task.cut_ratio,
-                            spatial_error=Program.task.spatial_error,
-                            const =Program.task.add_const)    
-                    
+        self.STRidge = STRidge(self.traversal.copy(), self.default_terms,
+                               noise_level=Program.task.noise_level,
+                               max_depth=Program.task.max_depth,
+                               cut_ratio=Program.task.cut_ratio,
+                               spatial_error=Program.task.spatial_error,
+                               const=Program.task.add_const)
+
     def __getstate__(self):
-        
+
         have_r = "r" in self.__dict__
         have_evaluate = "evaluate" in self.__dict__
         possible_const = have_r or have_evaluate
-        
-        state_dict = {'tokens' : self.tokens, # string rep comes out different if we cast to array, so we can get cache misses.
-                      'have_r' : bool(have_r),
-                      'r' : float(self.r) if have_r else float(-np.inf), 
-                      'have_evaluate' : bool(have_evaluate),
-                      'evaluate' : self.evaluate if have_evaluate else float(-np.inf), 
-                      'const' : array.array('d', self.get_constants()) if possible_const else float(-np.inf), 
-                      'on_policy_count' : bool(self.on_policy_count),
-                      'off_policy_count' : bool(self.off_policy_count),
-                      'originally_on_policy' : bool(self.originally_on_policy),
-                      'invalid' : bool(self.invalid), 
-                      'error_node' : array.array('u', "" if not self.invalid else self.error_node), 
-                      'error_type' : array.array('u', "" if not self.invalid else self.error_type)}    
-        
+
+        state_dict = {'tokens': self.tokens,
+                      # string rep comes out different if we cast to array, so we can get cache misses.
+                      'have_r': bool(have_r),
+                      'r': float(self.r) if have_r else float(-np.inf),
+                      'have_evaluate': bool(have_evaluate),
+                      'evaluate': self.evaluate if have_evaluate else float(-np.inf),
+                      'const': array.array('d', self.get_constants()) if possible_const else float(-np.inf),
+                      'on_policy_count': bool(self.on_policy_count),
+                      'off_policy_count': bool(self.off_policy_count),
+                      'originally_on_policy': bool(self.originally_on_policy),
+                      'invalid': bool(self.invalid),
+                      'error_node': array.array('u', "" if not self.invalid else self.error_node),
+                      'error_type': array.array('u', "" if not self.invalid else self.error_type)}
+
         # In the future we might also return sympy_expr and complexity if we ever need to compute in parallel 
 
         return state_dict
-                
+
     def __setstate__(self, state_dict):
-        
+
         # Question, do we need to init everything when we have already run, or just some things?
         self._init(state_dict['tokens'], state_dict['originally_on_policy'])
-        
+
         have_run = False
-        
+
         if state_dict['have_r']:
             setattr(self, 'r', state_dict['r'])
             have_run = True
-            
+
         if state_dict['have_evaluate']:
             setattr(self, 'evaluate', state_dict['evaluate'])
-            have_run = True 
-        
+            have_run = True
+
         if have_run:
             self.set_constants(state_dict['const'].tolist())
             self.invalid = state_dict['invalid']
@@ -333,83 +331,90 @@ class Program(object):
             self.on_policy_count = state_dict['on_policy_count']
             self.off_policy_count = state_dict['off_policy_count']
 
-    def execute_STR(self,u, x,ut,  test=False, wf=False):
+    def execute_STR(self, u, x, ut, test=False, wf=False):
         if wf:
-            y_hat, w_best, self.invalid,self.error_node,self.error_type, y_right= self.STRidge.wf_calculate(u,x,ut, \
-            test, Program.execute_function)
+            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.wf_calculate(u, x, ut, \
+                                                                                                               test,
+                                                                                                               Program.execute_function)
         else:
-            y_hat, w_best, self.invalid,self.error_node,self.error_type, y_right= self.STRidge.calculate(u,x,ut, \
-                test, Program.execute_function)
+            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u, x, ut, \
+                                                                                                            test,
+                                                                                                            Program.execute_function)
 
         return y_hat, y_right, w_best
-    
-    def execute_terms(self,u,x):
-        results =  self.STRidge.evaluate_terms(u,x, execute_function =Program.execute_function )
+
+    def execute_terms(self, u, x):
+        results = self.STRidge.evaluate_terms(u, x, execute_function=Program.execute_function)
         #  todo return  n*d
-        
+
         return results
-        
-    def execute_multi_STR(self,u,x,ut, test = False):
-        self.cached_terms, cached_vals = None, None  
-        y_hat, w_best, self.invalid,self.error_node,self.error_type, y_right=  self.STRidge.calculate(u,\
-            x,ut, test, Program.execute_function, cached = (self.cached_terms, cached_vals))
-        
+
+    def execute_multi_STR(self, u, x, ut, test=False):
+        self.cached_terms, cached_vals = None, None
+        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u, \
+                                                                                                        x, ut, test,
+                                                                                                        Program.execute_function,
+                                                                                                        cached=(
+                                                                                                        self.cached_terms,
+                                                                                                        cached_vals))
+
         return y_hat, y_right, w_best
-    
+
     def sample_cached_terms(self):
-        
+
         self.cached_terms, cached_vals = self.task.sample_cached_terms()
         return cached_vals
-    
-    def execute_BFGS(self,u, x, ut,):
+
+    def execute_BFGS(self, u, x, ut, ):
         # default coef for every terms is 1
         # self.set_stridge()
         # import pdb;pdb.set_trace()
-        y_hat, w_best, self.invalid,self.error_node,self.error_type, y_right = self.STRidge.evaluate(self.traversal,\
-                                                                                                      u,x,ut, Program.execute_function )
-        return y_hat, y_right,w_best
-    
-    def execute(self, u,x,ut,wf = False,):
+        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.evaluate(self.traversal, \
+                                                                                                       u, x, ut,
+                                                                                                       Program.execute_function)
+        return y_hat, y_right, w_best
+
+    def execute(self, u, x, ut, wf=False, ):
         if isinstance(Program.const_optimizer, ScipyMinimize):
-            self.cached_terms=None
-            return self.execute_BFGS(u,x,ut)
+            self.cached_terms = None
+            return self.execute_BFGS(u, x, ut)
 
         else:
             if isinstance(ut, list):
                 # multi-dataset for subgrid force or multi state variables
-                return self.execute_multi_STR(u,x,ut) 
+                return self.execute_multi_STR(u, x, ut)
             else:
                 # single stridge
-                self.cached_terms=None
-                return self.execute_STR(u, x,ut,wf = wf)
-                
+                self.cached_terms = None
+                return self.execute_STR(u, x, ut, wf=wf)
+
     def execute_test(self, u, x, ut):
-        results = self.STRidge.calculate_RHS_terms(u,x, Program.execute_function)
+        results = self.STRidge.calculate_RHS_terms(u, x, Program.execute_function)
         return results
-    
-    def execute_stability_test(self):     
+
+    def execute_stability_test(self):
         return self.task.stability_test(self)
-    
+
     def switch_tokens(self, token_type='torch'):
         if token_type == 'torch':
-            torch_tokens = Program.library.torch_tokens # dicts key == numpy_op+t, value = torch tokens
-            if len(torch_tokens)==0:
+            torch_tokens = Program.library.torch_tokens  # dicts key == numpy_op+t, value = torch tokens
+            if len(torch_tokens) == 0:
                 # print("AD Utilized")
                 return
             np_tokens_name = Program.library.np_names
             if "_t" in np_tokens_name[0]:
                 # use ad to generate meta data 
-                return 
+                return
             new_traversal = []
             for t in self.traversal:
                 if t.name in np_tokens_name:
-                    new_traversal.append(torch_tokens[t.name+'_t'])
+                    new_traversal.append(torch_tokens[t.name + '_t'])
                 else:
                     new_traversal.append(t)
         else:
             assert token_type == 'subgrid'
-            subgrid_tokens = Program.library.subgrid_tokens # dicts key == numpy_op+t, value = torch tokens
-            if len(subgrid_tokens)==0:
+            subgrid_tokens = Program.library.subgrid_tokens  # dicts key == numpy_op+t, value = torch tokens
+            if len(subgrid_tokens) == 0:
                 return
             new_traversal = []
             for t in self.traversal:
@@ -418,24 +423,24 @@ class Program(object):
                     new_traversal.append(subgrid_tokens[t.name])
                 else:
                     new_traversal.append(t)
-            
+
         self.traversal = new_traversal
         self.set_stridge()
-                
+
     @cached_property
     def terms_values(self):
-        #return term tokens and their values
+        # return term tokens and their values
         tokens, values = self.task.terms_values(self)
-        return  tokens, values
-        
+        return tokens, values
+
     @cached_property
     def mse(self):
         return self.task.mse
-    
+
     @cached_property
     def cv(self):
         return self.task.cv
-    
+
     @cached_property
     def evaluate(self):
         """Evaluates and returns the evaluation metrics of the program."""
@@ -461,7 +466,7 @@ class Program(object):
         # original settings: pre sum up the consts 
         if len(self.const_pos) == 0:
             return
-        
+
         # Define the objective function: negative reward
         def f(consts):
             self.set_constants(consts)
@@ -476,14 +481,13 @@ class Program(object):
             return r
 
         # Do the optimization
-        x0 = np.ones(len(self.const_pos)) # Initial guess
+        x0 = np.ones(len(self.const_pos))  # Initial guess
         optimized_constants = Program.const_optimizer(f, x0)
 
         # Set the optimized constants
         self.set_constants(optimized_constants)
         # reset time
         # Program.const_optimizer.reset()
-        
 
     def get_constants(self):
         """Returns the values of a Program's constants."""
@@ -500,7 +504,6 @@ class Program(object):
             # instance and just overwrite each other's value.
             self.traversal[self.const_pos[i]] = PlaceholderConstant(const)
 
-
     @classmethod
     def set_n_objects(cls, n_objects):
         Program.n_objects = n_objects
@@ -512,22 +515,21 @@ class Program(object):
         cls.cache = {}
         STRidge.clear_cache()
 
-
     @classmethod
     def set_task(cls, task):
         """Sets the class' Task"""
 
         Program.task = task
         Program.library = task.library
-        
+
     @classmethod
     def reset_task(cls, model, generate_type):
-        
+
         '''
         generate_type = AD or FD
         '''
-        Program.task.generate_meta_data(model,generate_type)  
-         
+        Program.task.generate_meta_data(model, generate_type)
+
     @classmethod
     def set_default_terms(cls, default_terms):
         Program.default_terms = default_terms
@@ -538,28 +540,27 @@ class Program(object):
         const_optimizer = make_const_optimizer(name, **kwargs)
         Program.const_optimizer = const_optimizer
 
-
     @classmethod
     def set_complexity(cls, name):
         """Sets the class' complexity function"""
 
         all_functions = {
             # No complexity
-            None : lambda p : 0.0,
+            None: lambda p: 0.0,
 
             # Length of sequence
-            "length" : lambda p : len(p.traversal),
+            "length": lambda p: len(p.traversal),
 
             # Sum of token-wise complexities
-            "token" : lambda p : sum([t.complexity for t in p.traversal]),
+            "token": lambda p: sum([t.complexity for t in p.traversal]),
 
         }
 
         assert name in all_functions, "Unrecognzied complexity function name."
-        Program.complexity_function = lambda p : all_functions[name](p)
+        Program.complexity_function = lambda p: all_functions[name](p)
 
     @classmethod
-    def set_execute(cls, protected,use_torch):
+    def set_execute(cls, protected, use_torch):
         """Sets which execute method to use"""
 
         # Check if cython_execute can be imported; if not, fall back to python_execute
@@ -570,11 +571,11 @@ class Program(object):
         #     Program.have_cython     = True
         # except ImportError:
         from dso.execute import python_execute, python_execute_torch
-        execute_function        = python_execute
-        Program.have_cython     = False
+        execute_function = python_execute
+        Program.have_cython = False
         Program.use_torch = use_torch
-        
-        Program.execute_function = unsafe_execute if not use_torch else unsafe_execute_torch 
+
+        Program.execute_function = unsafe_execute if not use_torch else unsafe_execute_torch
         Program.protected = False
 
     @cached_property
@@ -586,14 +587,12 @@ class Program(object):
             self.optimize_inner_constant()
             result, self.w = self.task.reward_function(self)
             return result
-                
+
     @cached_property
     def complexity(self):
         """Evaluates and returns the complexity of the program"""
 
         return Program.complexity_function(self)
-
-
 
     @cached_property
     def sympy_expr(self):
@@ -609,7 +608,7 @@ class Program(object):
             tree = build_tree(tree)
             tree = convert_to_sympy(tree)
             try:
-                expr = parse_expr(tree.__repr__()) # SymPy expression
+                expr = parse_expr(tree.__repr__())  # SymPy expression
             except:
                 expr = tree.__repr__()
             return [expr]
@@ -620,7 +619,7 @@ class Program(object):
                 tree = build_tree(tree)
                 tree = convert_to_sympy(tree)
                 try:
-                    expr = parse_expr(tree.__repr__()) # SymPy expression
+                    expr = parse_expr(tree.__repr__())  # SymPy expression
                 except:
                     expr = tree.__repr__()
                 exprs.append(expr)
@@ -628,8 +627,7 @@ class Program(object):
 
     def pretty(self):
         """Returns pretty printed string of the program"""
-        return [pretty(self.sympy_expr[i]) for i in range(Program.n_objects)] 
-
+        return [pretty(self.sympy_expr[i]) for i in range(Program.n_objects)]
 
     def print_stats(self):
         """Prints the statistics of the program
@@ -656,10 +654,10 @@ class Program(object):
 
     def __repr__(self):
         """Prints the program's traversal"""
-        
+
         return ','.join([repr(t) for t in self.traversal])
 
-    @property   
+    @property
     def str_expression(self):
         out = ""
         # else:
@@ -668,34 +666,29 @@ class Program(object):
         for number, traversal in zip(self.w, self.STRidge.terms):
             # traversal_str =','.join([repr(t) for t in traversal])
             # import pdb;pdb.set_trace()
-            out+="%.4f"%number +" * "+ repr(traversal) +' + '
+            out += "%.4f" % number + " * " + repr(traversal) + ' + '
         prefix = ""
         if self.cached_terms is not None:
             for traversal in self.cached_terms:
-                prefix += repr(traversal) +' + '
-        if  len(self.w)-len(self.STRidge.terms)==1:
-            out+= "%.4f"%self.w[-1]+' + '
+                prefix += repr(traversal) + ' + '
+        if len(self.w) - len(self.STRidge.terms) == 1:
+            out += "%.4f" % self.w[-1] + ' + '
         return prefix + out[:-3]
-    
+
     @property
     def funcion_expression(self):
-        out = " |".join([repr(function ) for function  in self.STRidge.terms])
-        return  out
-    
+        out = " |".join([repr(function) for function in self.STRidge.terms])
+        return out
+
     @property
     def coefficents(self):
-        out = "|".join([str(round(w,4)) for w  in self.w])
-        return  out
-
+        out = "|".join([str(round(w, 4)) for w in self.w])
+        return out
 
 
 ###############################################################################
 # Everything below this line is currently only being used for pretty printing #
 ###############################################################################
-
-
-
-
 
 
 def convert_to_sympy(node):

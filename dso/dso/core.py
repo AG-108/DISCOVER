@@ -30,7 +30,7 @@ class DeepSymbolicOptimizer:
 
     Parameters
     ----------
-    config : dict or str
+    config : dict
         Config dictionary or path to JSON.
 
     Attributes
