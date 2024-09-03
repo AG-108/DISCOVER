@@ -23,7 +23,7 @@ from dso.program import Program
 from dso.config import load_config
 from dso.tf_state_manager import make_state_manager as manager_make_state_manager
 
-class DeepSymbolicOptimizer():
+class DeepSymbolicOptimizer:
     """
     Deep symbolic optimization model. Includes model hyperparameters and
     training configuration.
@@ -70,7 +70,7 @@ class DeepSymbolicOptimizer():
         self.gp_controller = self.make_gp_controller()
 
     def train(self):
-        # Setup the model
+        # Set up the model
         self.setup()
 
         # Train the model
@@ -115,7 +115,7 @@ class DeepSymbolicOptimizer():
     def set_seeds(self):
         """
         Set the tensorflow, numpy, and random module seeds based on the seed
-        specified in config. If there is no seed or it is None, a time-based
+        specified in config. If there is no seed, or it is None, a time-based
         seed is used instead and is written to config.
         """
 
@@ -153,10 +153,11 @@ class DeepSymbolicOptimizer():
 
     def make_gp_controller(self):
         if self.config_gp_meld.pop("run_gp_meld", False):
-            from dso.gp.gp_controller import GPController
-            gp_controller = GPController(self.prior,
-                                         self.pool,
-                                         **self.config_gp_meld)
+            # from dso.gp.gp_controller import GPController
+            # gp_controller = GPController(self.prior,
+            #                              self.pool,
+            #                              **self.config_gp_meld)
+            gp_controller = None
         else:
             gp_controller = None
         return gp_controller

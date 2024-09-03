@@ -3,10 +3,12 @@ load noisy and sparse data for the PINN traing
 
 """
 import numpy as np
+import pandas as pd
 import scipy
 from pyDOE import lhs
 import matplotlib.pyplot as plt
 from dso.task.pde.utils_noise import np2tensor, load_PI_data
+from sklearn.model_selection import train_test_split
 
 
 class Dataset:
@@ -225,7 +227,6 @@ def add_noise(un):
 def load_real_data():
     X = []
     data = np.load('./dso/task/pde/data/PAR.npz')
-    # import pdb;pdb.set_trace()
     gPAR2, gPAR6 = data['gPAR2'], data['gPAR6']
     gv = data['gV']
     x, t = data['X_PAR'], data['T_PAR']
@@ -251,6 +252,7 @@ def load_2d2U_data(dataset,
                    coll_num=100000,
                    spline_sample=False
                    ):
+    # TODO: remove parameter pic_path and implement spline_sample
     ######################################################################
     # Load 2 dimensional data
     # Args:
@@ -258,26 +260,43 @@ def load_2d2U_data(dataset,
     #         e.g. 'Burgers2', 'KS', 'KS_sine', 'KS2', 'fisher', 'fisher_linear', 'PDE_divide'
     #     noise_level: float
     #     data_ratio: float
-    #     pic_path: str
+    #     pic_path: str (To be deprecated)
     #     coll_num: int
-    #     spline_sample: bool
+    #     spline_sample: bool (To be implemented)
     #         whether to spline the missing entries
     # Returns:
-
+    #     X_train: np.array (N, 3)
+    #         containing x, y, t value for corresponding response in training set
+    #     response_train: np.array (N, p)
+    #         response variable value in training set
+    #     X_f_train: np.array (N+coll_num, 3)
+    #         containing x, y, t value for corresponding response in training set and collocation points
+    #     X_val: np.array (N, 3)
+    #         containing x, y, t value for corresponding response in validation set
+    #     response_val: np.array (N, p)
+    #         response value in validation set
+    #     [lb, ub]: list of np.array
+    #         columnwise bounds for x, y, t, all with shape(1, 3)
+    #     [X, response]: list of np.array
+    #         Full dataset, X with shape (M, 3), response with shape (M, p)
+    #     [response.shape]: list of np.array
+    #         shape of response(full dataset)
+    ######################################################################
     if dataset == 'Allen_Cahn_2D':
         path = './dso/task/pde/data/bcpinn_ac.npz'
-        data = np.load(path)
-        U = data['u'].transpose(1, 2, 0)  # x,y,t
+        try:
+            data = np.load(path)
+        except FileNotFoundError:
+            # Just for test
+            Warning(f"File {path} not found, using random data")
+            data = {'u': np.ones((101, 64, 64))}
+        U = data['u'].transpose((1, 2, 0))  # x,y,t
 
-        dx = 1 / 64
-        dy = dx
-        h = dx
+        h = 1 / 64
         y_data = np.linspace(-0.5 * h, 1 + h * 0.5, 64 + 2)[1:-1].reshape(-1, 1)
         x_data = np.linspace(-0.5 * h, 1 + h * 0.5, 64 + 2)[1:-1].reshape(-1, 1)
         t_data = np.linspace(0, 5, 101).reshape(-1, 1)
         n, m, steps = U.shape
-
-        dt = t_data[1, 0] - t_data[0, 0]
 
         # Detensorize:
         #     Unravel the tensor U into a matrix w_data, and align each u
@@ -285,29 +304,24 @@ def load_2d2U_data(dataset,
 
         w_data = U.reshape(n * m, steps)
 
-        # t_data = np.arange(steps).reshape((1, -1))*dt         
+        # This part reset the coordinates
         t_data = np.tile(t_data, (m * n, 1))
 
-        # This part reset the coordinates
-        # x_data = np.arange(n).reshape((-1, 1))*dx 
         x_data = np.tile(x_data, (1, m))
         x_data = np.reshape(x_data, (-1, 1))
         x_data = np.tile(x_data, (1, steps))
 
-        # y_data = np.arange(m).reshape((1, -1))*dy 
         y_data = np.tile(y_data, (n, 1))
         y_data = np.reshape(y_data, (-1, 1))
         y_data = np.tile(y_data, (1, steps))
 
         # coll data
-        # Preprocess data #2(compatible with NN format)
         # unsqueeze the vectors to shape(N, 1)
         t_star = np.reshape(t_data, (-1, 1))
         x_star = np.reshape(x_data, (-1, 1))
         y_star = np.reshape(y_data, (-1, 1))
         w_star = np.reshape(w_data, (-1, 1))
-        # import pdb;pdb.set_trace()
-        # stack the variables
+
         X_star = np.hstack((x_star, y_star, t_star))
 
         # ordinary sample
@@ -339,7 +353,7 @@ def load_2d2U_data(dataset,
         N_f = coll_num
         # Latin Hypercube Sampling between the bounds
         X_f = lb + (ub - lb * 2) * lhs(3, N_f)
-        # append random samples to original samples
+        # append random samples to original samples(What's the use of this???)
         X_f = np.vstack((X_f, X_train))
 
         # add noise
@@ -350,7 +364,7 @@ def load_2d2U_data(dataset,
         # X, Y, T = np.meshgrid(x, y, t)  
         # sym_true = 'add,add,Diff2,u1,x1,Diff2,u1,x2,sub,u1,n3,u1'
 
-    elif "rd" == dataset:
+    elif dataset == "rd":
         data = scipy.io.loadmat('./dso/task/pde/data/reaction_diffusion_standard.mat')  # grid 256*256*201
 
         t = np.real(data['t'].flatten()[:, None])
@@ -522,7 +536,6 @@ def load_2d2U_data(dataset,
         return X_star_train, uv_star_train, X_f, X_star_val, uv_star_val, [lb, ub], [X_star, uv_star], [
             uv_star.shape[0]]
     elif 'ns' in dataset:
-
         if dataset == "ns_MD_NU":
             data = scipy.io.loadmat('./dso/task/pde/data/Vorticity_ALL.mat')
             steps = 151
@@ -749,7 +762,7 @@ def load_2d2U_data(dataset,
             v_val = v_meas[idx_val, :]
             w_val = w_meas[idx_val, :]
 
-            # Doman bounds        
+            # Domain bounds
             lb = X_star.min(0)
             ub = X_star.max(0)
 
@@ -772,5 +785,20 @@ def load_2d2U_data(dataset,
             uv_star = np.concatenate([w_star, u_star, v_star], axis=1)
             uvw_star_val = np.concatenate([w_val, u_val, v_val], axis=1)
             return X_train, uvw_star_train, X_f, X_val, uvw_star_val, [lb, ub], [X_star, uv_star]
+        elif dataset == 'battery':
+            data = pd.read_csv('./dso/task/pde/data_new/EC_EMC+LiPF6.csv')
+            X = data['X']
+            y = data['y']
+            lb = X.min(0)
+            ub = X.max(0)
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+            N_f = coll_num
+            X_f = lb + (ub - lb) * lhs(2, N_f)
+            X_f = np.vstack((X_f, X_train))
+            return X_train, y_train, X_f, X_val, y_val, [lb, ub], [X, y], [y.shape]
         else:
             assert False, "Unknown dataset"
+
+
+if __name__ == '__main__':
+    load_2d2U_data('Allen_Cahn_2D', 0.05, 0.8, './', 100000, False)

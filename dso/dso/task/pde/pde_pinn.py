@@ -184,7 +184,7 @@ class PDEPINNTask(PDETask):
 
     def generate_meta_data(self, model, generation_type = 'AD', plot= False):
         """
-        Generate meta data based on NN. 
+        Generate metadata based on NN.
         FD refers to the finite difference. Only generate data on regulard grids
         AD refers to the automatic differentiation. Use collocation data as trainging data
         Args:

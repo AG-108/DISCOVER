@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.polynomial.legendre import leggauss
 
 from dso.task.pde.data_load import *
@@ -72,7 +73,7 @@ class WeakPDEPINNTask(PDEPINNTask):
     model = None
 
     def __init__(self,
-                 weak_params=None):
+                 weak_params=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # weak formulation discovery
@@ -84,7 +85,7 @@ class WeakPDEPINNTask(PDEPINNTask):
             self.wf_flag = True
 
     def generate_meta_data(self, model, generation_type='AD', plot=False):
-        super().generate_meta_data(*args, **kwargs)
+        super().generate_meta_data(model, generation_type, plot)
         self.weak_form_cal(x, model)
         return
 
