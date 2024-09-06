@@ -785,19 +785,19 @@ def load_2d2U_data(dataset,
             uv_star = np.concatenate([w_star, u_star, v_star], axis=1)
             uvw_star_val = np.concatenate([w_val, u_val, v_val], axis=1)
             return X_train, uvw_star_train, X_f, X_val, uvw_star_val, [lb, ub], [X_star, uv_star]
-        elif dataset == 'battery':
-            data = pd.read_csv('./dso/task/pde/data_new/EC_EMC+LiPF6.csv')
-            X = data['X']
-            y = data['y']
+    elif dataset == 'battery':
+            data = pd.read_csv('./dso/task/pde/data_new/battery_detrd.csv')
+            X = data.iloc[:, 0:3].to_numpy()
+            y = data.iloc[:, 3].to_numpy().reshape(-1, 1)
             lb = X.min(0)
             ub = X.max(0)
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
             N_f = coll_num
-            X_f = lb + (ub - lb) * lhs(2, N_f)
+            X_f = lb + (ub - lb) * lhs(3, N_f)
             X_f = np.vstack((X_f, X_train))
             return X_train, y_train, X_f, X_val, y_val, [lb, ub], [X, y], [y.shape]
-        else:
-            assert False, "Unknown dataset"
+    else:
+        assert False, "Unknown dataset"
 
 
 if __name__ == '__main__':

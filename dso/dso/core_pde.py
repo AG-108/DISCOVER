@@ -9,13 +9,13 @@ from time import time
 from datetime import datetime
 import numpy as np
 import tensorflow as tf
-import commentjson as json
 import torch
 
 #####################
-# DO NOT DELETE ROW 18! OTHERWISE, LOOP IMPORT ERROR WILL OCCUR
+# DO NOT DELETE THE NEXT ROW! OTHERWISE, LOOP IMPORT ERROR WILL OCCUR
 #####################
 from dso.task import set_task
+# TODO: Fix the import error and optimize file structure
 
 from dso.controller import Controller
 from dso.train import learn
@@ -69,8 +69,8 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
         Builds and trains the model according to config.
     """
 
-    def __init__(self, config=None, pde_config=None):
-        config = load_config(config)
+    def __init__(self, config_path=None, pde_config=None):
+        config = load_config(config_path)
         if pde_config is not None:
             config = safe_merge_dicts(config, pde_config)
 
@@ -86,7 +86,7 @@ class DeepSymbolicOptimizer_PDE(DeepSymbolicOptimizer):
         self.config_param = self.config['parameterized']
         self.config_gp_agg = self.config["gp_agg"]
 
-        _, file_name = os.path.split(config)
+        _, file_name = os.path.split(config_path)
         self.job_name = file_name.split('.j')[0]
         self.sess = None
 

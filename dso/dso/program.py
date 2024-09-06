@@ -129,7 +129,7 @@ def from_tokens(tokens, skip_cache=False, on_policy=True, finish_tokens=True):
         already done this. Most likely you will want this to be True. 
 
     Returns
-    _______
+    ___________
     program : Program
         The Program corresponding to the tokens, either pulled from memoization
         or generated from scratch.
@@ -183,11 +183,11 @@ class Program(object):
         List of operators (type: Function) and terminals (type: int, float, or
         str ("const")) encoding the pre-order traversal of the expression tree.
 
-    tokens : np.ndarry (dtype: int)
+    tokens : np.ndarray (dtype: int)
         Array of integers whose values correspond to indices
 
     const_pos : list of int
-        A list of indicies of constant placeholders along the traversal.
+        A list of indices of constant placeholders along the traversal.
 
     float_pos : list of float
         A list of indices of constants placeholders or floating-point constants
@@ -198,7 +198,7 @@ class Program(object):
         Used for pretty printing _only_.
 
     complexity : float
-        The (lazily calcualted) complexity of the program.
+        The (lazily calculated) complexity of the program.
 
     r : float
         The (lazily calculated) reward of the program.
@@ -220,7 +220,6 @@ class Program(object):
     default_terms = []
     # Cython-related static variables
     have_cython = None  # Do we have cython installed
-    execute = None  # Link to execute. Either cython or python
     cyfunc = None  # Link to cyfunc lib since we do an include inline
 
     function_terms = {}  # cache the bst reward sample function terms
@@ -228,7 +227,7 @@ class Program(object):
 
     def __init__(self, tokens=None, on_policy=True):
         """
-        Builds the Program from a list of of integers corresponding to Tokens.
+        Builds the Program from a list of integers corresponding to Tokens.
         """
 
         # Can be empty if we are unpickling 
@@ -333,11 +332,11 @@ class Program(object):
 
     def execute_STR(self, u, x, ut, test=False, wf=False):
         if wf:
-            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.wf_calculate(u, x, ut, \
+            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.wf_calculate(u, x, ut,
                                                                                                                test,
                                                                                                                Program.execute_function)
         else:
-            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u, x, ut, \
+            y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u, x, ut,
                                                                                                             test,
                                                                                                             Program.execute_function)
 
@@ -351,7 +350,7 @@ class Program(object):
 
     def execute_multi_STR(self, u, x, ut, test=False):
         self.cached_terms, cached_vals = None, None
-        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u, \
+        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.calculate(u,
                                                                                                         x, ut, test,
                                                                                                         Program.execute_function,
                                                                                                         cached=(
@@ -369,7 +368,7 @@ class Program(object):
         # default coef for every terms is 1
         # self.set_stridge()
         # import pdb;pdb.set_trace()
-        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.evaluate(self.traversal, \
+        y_hat, w_best, self.invalid, self.error_node, self.error_type, y_right = self.STRidge.evaluate(self.traversal,
                                                                                                        u, x, ut,
                                                                                                        Program.execute_function)
         return y_hat, y_right, w_best
@@ -570,7 +569,7 @@ class Program(object):
         #     execute_function        = cython_execute
         #     Program.have_cython     = True
         # except ImportError:
-        from dso.execute import python_execute, python_execute_torch
+        from dso.execute import python_execute
         execute_function = python_execute
         Program.have_cython = False
         Program.use_torch = use_torch

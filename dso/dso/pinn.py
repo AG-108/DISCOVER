@@ -115,6 +115,7 @@ class PINN_model:
         elif self.data_type == '2D_2U':
             load_class = load_2d2U_data
 
+        print(self.coll_data)
         X_u_train, u_train, X_f_train, X_u_val, u_val, [lb, ub], [x_star, u_star], self.shape = load_class(
             self.dataset_name,
             self.noise,

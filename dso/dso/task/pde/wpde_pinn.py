@@ -1,4 +1,3 @@
-import numpy as np
 from numpy.polynomial.legendre import leggauss
 
 from dso.task.pde.data_load import *
